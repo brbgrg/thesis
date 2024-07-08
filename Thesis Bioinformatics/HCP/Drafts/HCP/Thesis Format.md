@@ -1,0 +1,1 @@
+![[HowToWriteAPaper.jpg]]

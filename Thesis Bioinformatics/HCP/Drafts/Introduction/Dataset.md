@@ -1,2 +1,15 @@
-We leverage an extensive neuroimaging dataset (620 subjects ranging from 7 to 85 years old)
-
+Puxeddu 2020:
+- We leverage an extensive neuroimaging dataset (620 subjects ranging from 7 to 85 years old)
+- we leveraged the openly available Nathan Kline Institute Rockland Sample dataset (NKI-RS, http://fcon_1000.projects.nitrc.org/ indi/enhanced/); an ongoing project which aims to collect a large scale (N > 1000) community sample of participants across the lifespan (Nooner et al., 2012). 
+- Institutional Review Board approval was obtained for this project at the Nathan Kline Institute (#226781 and #239708) and at Montclair State University (#000983 A and #000983B) in accordance with relevant guidelines. All participants gave written informed consent or assent. 
+- The anonymized dataset is freely available through an Amazon S3 Bucket at http://fcon_1000.projects.nitrc.org /indi/enhanced/neurodata.html. 
+- Both T1-weighted (T1w) and diffusion (dMRI) images are provided, collected with a 3T Siemens Magneton Tim Trio scanner, using a 12-channel head coil. 
+- T1w images were pre-processed with the FreeSurfer (http://surfer.nmr.mgh.harvard.edu/) recon-all pipeline to reconstruct the Yeo17 network parcellation, which renders 114 cortical nodes (https://github.com/ThomasYeoLab). 
+- dMRI images were denoised, corrected for motion and susceptibility distortion, and then aligned to the corresponding T1w. 
+- Deterministic streamline tractography was run using Dipy (Garyfallidis et al., 2014). 
+- Finally, we extracted the structural connectivity matrices normalizing the number of streamlines that connect each region of interest (ROI) of the network parcellation, by the geometric mean volume of the connected ROIs (regions of interest) (Betzel and Bassett, 2018; Faskowitz et al., 2018). 
+- In this way, we obtained weighted anatomical connectivity matrices where weights represent the connection density between brain regions. 
+- We performed rigorous quality control on these matrices excluding subjects based on T1w viability, presence of artifacts on dMRI, quality of tractography reconstruction and excessive sparseness of the adjacency ma trix. 
+- More details about data processing can be found in (Faskowitz et al., 2018).
+- Following data processing, we obtained an ensemble of 620 anatomical weighted networks covering participants non-uniformly distributed between 7 and 85 years old. 
+- The networks were summarized as adjacency matrices W = \[wij\] , made of N = 114 nodes representing cortical ROIs of the Yeo parcellation (Thomas Yeo et al., 2011), ij $\in[1, 114]$, whose entries denote the structural connection weights between each pair of nodes. 
