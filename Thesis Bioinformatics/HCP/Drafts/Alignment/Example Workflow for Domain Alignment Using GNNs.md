@@ -1,0 +1,7 @@
+- **Preprocessing**: Construct brain networks from neuroimaging data (e.g., fMRI, DTI) for each domain.
+- **Feature Extraction**: Extract relevant features for each node (e.g., connectivity profiles, anatomical properties).
+- **Model Selection**: Choose a suitable GNN architecture (e.g., GCN, GAT).
+- **Training**: Train the GNN on the source domain data, optimizing for node classification or another relevant task.
+- **Domain Adaptation**: Use techniques like domain adversarial training to align the feature distributions of source and target domains.
+- **Alignment**: Apply the trained model to embed brain networks from both domains into a common latent space and align them.
+- **Evaluation**: Assess the alignment quality using metrics such as node correspondence accuracy, structural similarity, and functional similarity.

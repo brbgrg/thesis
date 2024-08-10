@@ -1,0 +1,3 @@
+- **PyTorch Geometric**: A library for deep learning on irregularly structured data like graphs.
+- **DGL (Deep Graph Library)**: Another library for scalable graph neural networks.
+- **TensorFlow**: General-purpose

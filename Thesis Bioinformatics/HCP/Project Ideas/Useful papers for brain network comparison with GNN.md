@@ -1,0 +1,21 @@
+- **Graph Neural Networks for Brain Network Analysis**:
+    - A study that showcases the application of GNNs in analyzing brain networks, demonstrating their effectiveness in capturing complex structural patterns (Li et al., 2019).
+- **Cross-Network Node Classification with GNNs**:
+    - This paper explores GNNs for cross-network tasks, which could be adapted for network alignment by focusing on the modular structures of brain networks (Kipf & Welling, 2016).
+- **Multi-Graph Alignment via GNNs**:
+    - A relevant work that discusses multi-graph alignment using GNNs, offering insights into methodologies that can be tailored for brain network comparison (Gupta et al., 2019).
+- **BrainGB: A Benchmark for Brain Network Analysis With Graph Neural Networks**:
+    - This paper presents BrainGB, a benchmark for brain network analysis with GNNs. It standardizes the process by summarizing brain network construction pipelines and modularizing the implementation of GNN designs. The study recommends ==general recipes for effective GNN designs on brain networks==, supporting open and reproducible research.
+    - [(Cui et al., 2023)](https://consensus.app/papers/braingb-benchmark-brain-network-analysis-with-graph-cui/f8a48080490d5e4eaa72419bdda25b5a/?utm_source=chatgpt)
+- **Graph Neural Networks in Network Neuroscience**:
+    - This review highlights current GNN-based methods and their applications in brain network analysis, such as disease classification and missing brain graph synthesis. It provides insights into the application of GNN models in network neuroscience for neurological disorder diagnosis and population graph integration.
+    - [(Bessadok et al., 2021)](https://consensus.app/papers/graph-neural-networks-network-neuroscience-bessadok/998e2c8213cb5cf6bee729ac48e5537d/?utm_source=chatgpt)
+- **Deep Reinforcement Learning Guided Graph Neural Networks for Brain Network Analysis**:
+    - This paper proposes a novel brain network representation framework, BN-GNN, which uses deep reinforcement learning to predict the optimal number of feature propagations for each brain network. This approach significantly improves the performance of traditional GNNs in brain network disease analysis tasks.
+    - [(Zhao et al., 2022)](https://consensus.app/papers/reinforcement-learning-guided-graph-neural-networks-zhao/a6dc853d4f6b574ca795bd82173bfa10/?utm_source=chatgpt)
+- **Estimating Functional Brain Networks by Incorporating a Modularity Prior**:
+    - This study proposes a novel functional brain network modeling scheme that encodes a modularity prior under a matrix-regularized network learning framework. The approach achieves high classification accuracy in identifying patients with mild cognitive impairment, outperforming conventional brain network construction methods.
+    - [(Qiao et al., 2016)](https://consensus.app/papers/estimating-brain-networks-incorporating-modularity-qiao/4fd4a37968e65aa4bfd4ee47f2663f67/?utm_source=chatgpt)
+- **Complex Modular Structure of Large-Scale Brain Networks**:
+    - This paper analyzes the modular organization of brain networks using a random-walk-based method. It shows that the modular architecture constitutes the structural basis for functional integration of distant and specialized brain areas during normal brain activities at rest.
+    - [(Valencia et al., 2009)](https://consensus.app/papers/modular-structure-brain-networks-valencia/d1471f2c168653f99584740798b252b6/?utm_source=chatgpt)
