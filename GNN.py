@@ -15,9 +15,13 @@ def visualize_matrix(matrix, title="Matrix Visualization"):
     plt.title(title)
     plt.show()
 
+# TODO: create configuration file
+# TODO: create docker file
+
+
 # Load SC and FC data from .mat files
-sc_data_path = r"C:\Users\barbo\Desktop\Tesi Bio\Dataset\brain_net\SC4alignment.mat"  # Update this path
-fc_data_path = r"C:\Users\barbo\Desktop\Tesi Bio\Dataset\brain_net\FC4alignment.mat"  # Update this path
+sc_data_path = "/workspaces/thesis/brain_net/SC4alignment.mat"  # Update this path
+fc_data_path = "/workspaces/thesis/brain_net/FC4alignment.mat"  # Update this path
 
 sc_data = load_mat_file(sc_data_path)
 fc_data = load_mat_file(fc_data_path)

@@ -1,0 +1,10 @@
+SC: structural connectivity (MRI)
+FC: functional connectivity during resting state (fMRI)
+
+young = 10 y.o.
+adult = 30 y.o.
+old = 70 y.o.
+
+SC and FC contain 5 different subjects for each age group
+e.g.:	sc.young has dimension 200*200*5 --> nodes*nodes*num_sbj
+
