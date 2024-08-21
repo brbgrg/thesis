@@ -59,15 +59,24 @@ print("fc_content fields:", fc_content.dtype.names) # ('young', 'adult', 'old')
 """
 
 # Extract the 'young', 'adult', and 'old' matrices from sc_content and fc_content
-sc_young_matrix = sc_content['young']
-sc_adult_matrix = sc_content['adult']
-sc_old_matrix = sc_content['old']
+sc_young_matrix = np.array(sc_content['young'])
+sc_adult_matrix = np.array(sc_content['adult'])
+sc_old_matrix = np.array(sc_content['old'])
 
-fc_young_matrix = fc_content['young'] 
-fc_adult_matrix = fc_content['adult']
-fc_old_matrix = fc_content['old']
+fc_young_matrix = np.array(fc_content['young'])
+fc_adult_matrix = np.array(fc_content['adult'])
+fc_old_matrix = np.array(fc_content['old'])
+
+
+# Check feasibility of the matrices
+# to do
+
+
+
+
 
 # Print the type and shape of the matrices
+
 """
 print("sc_young_matrix:", type(sc_young_matrix), sc_young_matrix.shape) # <class 'numpy.ndarray'> (200, 200, 5)
 print("sc_adult_matrix:", type(sc_adult_matrix), sc_adult_matrix.shape) # <class 'numpy.ndarray'> (200, 200, 5)
@@ -109,12 +118,32 @@ plt.show()
 """
 
 # Community Detection
+
 import networkx as nx
 import community as community_louvain
+
+
+# Preprocessing the matrices 
+
+# DID NOT SOLVE BAD NODE DEGREEEE
+
+
+
+def preprocess_fc_matrix(matrix, threshold=0.5):
+    """Preprocess the FC matrix to apply thresholding while keeping significant negative weights."""
+    # Apply threshold to the absolute values of the weights
+    matrix[np.abs(matrix) < threshold] = 0
+    
+    return matrix
+
+
+fc_young_matrix_preprocessed = [preprocess_fc_matrix(fc_young_matrix[:, :, i]) for i in range(5)]
+
 
 # Convert matrices to graphs
 def matrix_to_graph(matrix):
     """Convert a matrix to a graph."""
+    # matrix = np.array(matrix)
     graph = nx.from_numpy_array(matrix)
     return graph
 
@@ -125,7 +154,9 @@ sc_old_graph = [matrix_to_graph(sc_old_matrix[:, :, i]) for i in range(5)]
 fc_young_graph = [matrix_to_graph(fc_young_matrix[:, :, i]) for i in range(5)]
 fc_adult_graph = [matrix_to_graph(fc_adult_matrix[:, :, i]) for i in range(5)]
 fc_old_graph = [matrix_to_graph(fc_old_matrix[:, :, i]) for i in range(5)]
-                 
+
+
+
 
 # Visualize the graphs
 """
@@ -147,15 +178,23 @@ plt.show()
 # Community detection using Louvain method
 def community_detection(graph):
     """Detect communities in a graph using Louvain method."""
+    # Remove nodes with zero degree
+    graph.remove_nodes_from(list(nx.isolates(graph)))
+
+    # Remove self-loops
+    graph.remove_edges_from(nx.selfloop_edges(graph))
+
     partition = community_louvain.best_partition(graph)
     return partition
 
+"""
 sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
 sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
 sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
-
+"""
 
 # BAD NODE DEGREE
+
 
 
 """
