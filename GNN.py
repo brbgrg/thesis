@@ -20,8 +20,8 @@ def visualize_matrix(matrix, title="Matrix Visualization"):
 
 
 # Load SC and FC data from .mat files
-sc_data_path = "/workspaces/thesis/brain_net/SC4alignment.mat"  # Update this path
-fc_data_path = "/workspaces/thesis/brain_net/FC4alignment.mat"  # Update this path
+sc_data_path = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\brain_net\SC4alignment.mat"  # Update this path
+fc_data_path = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\brain_net\FC4alignment.mat"  # Update this path
 
 sc_data = load_mat_file(sc_data_path)
 fc_data = load_mat_file(fc_data_path)
@@ -80,20 +80,99 @@ print("fc_old_matrix:", type(fc_old_matrix), fc_old_matrix.shape) # <class 'nump
 
 # Visualize the matrices
 """
-visualize_matrix(sc_young_matrix[:,:,0], title="Young SC Matrix")
-visualize_matrix(sc_adult_matrix[:,:,0], title="Adult SC Matrix")
-visualize_matrix(sc_old_matrix[:,:,0], title="Old SC Matrix")
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
-visualize_matrix(fc_young_matrix[:,:,0], title="Young FC Matrix")
-visualize_matrix(fc_adult_matrix[:,:,0], title="Adult FC Matrix")
-visualize_matrix(fc_old_matrix[:,:,0], title="Old FC Matrix")
+for i in range(5):
+    axs[0, i].imshow(sc_young_matrix[:, :, i], cmap='viridis')
+    axs[0, i].set_title(f"Young SC Matrix {i+1}")
+    axs[1, i].imshow(sc_adult_matrix[:, :, i], cmap='viridis')
+    axs[1, i].set_title(f"Adult SC Matrix {i+1}")
+    axs[2, i].imshow(sc_old_matrix[:, :, i], cmap='viridis')
+    axs[2, i].set_title(f"Old SC Matrix {i+1}")
+
+plt.tight_layout()
+plt.show()
+
+
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    axs[0, i].imshow(fc_young_matrix[:, :, i], cmap='viridis')
+    axs[0, i].set_title(f"Young FC Matrix {i+1}")
+    axs[1, i].imshow(fc_adult_matrix[:, :, i], cmap='viridis')
+    axs[1, i].set_title(f"Adult FC Matrix {i+1}")
+    axs[2, i].imshow(fc_old_matrix[:, :, i], cmap='viridis')
+    axs[2, i].set_title(f"Old FC Matrix {i+1}")
+
+plt.tight_layout()
+plt.show()
 """
 
+# Community Detection
+import networkx as nx
+import community as community_louvain
 
-#Given this dataset, can I build a Graph Neural Network (GNN) to perform network alignment for a comparative analysis of the modular structures in Structural Connectivity (SC) and Functional Connectivity (FC) networks across the three age groups?
+# Convert matrices to graphs
+def matrix_to_graph(matrix):
+    """Convert a matrix to a graph."""
+    graph = nx.from_numpy_array(matrix)
+    return graph
 
-# GNN
-import torch
-import torch.nn.functional as F
- 
-print (torch.__version__) # 2.4.0+cu118
+sc_young_graph = [matrix_to_graph(sc_young_matrix[:, :, i]) for i in range(5)]
+sc_adult_graph = [matrix_to_graph(sc_adult_matrix[:, :, i]) for i in range(5)]
+sc_old_graph = [matrix_to_graph(sc_old_matrix[:, :, i]) for i in range(5)]
+
+fc_young_graph = [matrix_to_graph(fc_young_matrix[:, :, i]) for i in range(5)]
+fc_adult_graph = [matrix_to_graph(fc_adult_matrix[:, :, i]) for i in range(5)]
+fc_old_graph = [matrix_to_graph(fc_old_matrix[:, :, i]) for i in range(5)]
+                 
+
+# Visualize the graphs
+"""
+def plot_graph_on_axis(graph, ax, title):
+    ax.set_title(title)
+    nx.draw(graph, ax = ax, with_labels=False, node_color='skyblue', node_size=1, edge_color='gray')
+
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(sc_young_graph[i], axs[0, i], f"Young SC Graph {i+1}")
+    plot_graph_on_axis(sc_adult_graph[i], axs[1, i], f"Adult SC Graph {i+1}")
+    plot_graph_on_axis(sc_old_graph[i], axs[2, i], f"Old SC Graph {i+1}")
+
+plt.tight_layout()
+plt.show()
+"""
+
+# Community detection using Louvain method
+def community_detection(graph):
+    """Detect communities in a graph using Louvain method."""
+    partition = community_louvain.best_partition(graph)
+    return partition
+
+sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
+sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
+sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
+
+
+# BAD NODE DEGREE
+
+
+"""
+fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
+fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph]
+fc_old_partition = [community_detection(graph) for graph in fc_old_graph]
+
+"""
+
+# Visualize the communities
+
+def plot_communities_on_axis(graph, partition, ax, title):
+    ax.set_title(title)
+    pos = nx.spring_layout(graph)
+    cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
+    nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray')
+
+
+
+
