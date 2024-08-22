@@ -1,5 +1,0 @@
-Puxeddu 2020:
-- To date, two main strategies have been employed to track variations in the network architecture across stages of life: (i) comparison among representative networks or (ii) among averages formed over large groups. 
-- However, these strategies could be confounded by differences in network properties (Fornito et al., 2013; van Wijk et al., 2010) that are not of interest to the current analysis.
-	- In fact, topological measures, such as communities, depend on the network’s density and edge distribution (Rubinov and Sporns, 2010), which vary not only across the lifespan (Betzel et al., 2014; Lim et al., 2015; Zuo et al., 2017), but also exhibit non-age related individual differences, making a comparison based on representative subjects difficult. 
-	- At the same time, averaging networks across larger populations likely leads to significant loss of information. 

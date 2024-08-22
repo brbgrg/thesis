@@ -1,6 +1,0 @@
-While effective when compared to traditional machine learning methods, still DL methods do not generalize well to non-Euclidean data types (e.g., graphs). More specifically, directly applying DL methods to graphs overlooks the relationships between nodes and their local connectedness patterns. This causes an important loss of topological properties inherently encoded in a graph representation. Recently, graph neural networks (GNNs) have been proposed to tackle this issue. GNNs are the core of a nascent field dealing with various graph-related tasks such as graph classification and graph representation learning. The main advantage of this domain is that it preserves graph topological properties while learning to perform a given task [42]–[44]. Such learning frameworks encapsulate both graph representation learning via embedding and scoring prediction via different operations such as pooling. The first GNN was designed for node classification where each node in the graph is associated with a label [45]. It mainly performs a propagation rule encapsulating node and edge features to generate prediction scores. Notably, the brain graph is a natural fit for GNN models thus there is a need to outline the reason of GNNs being worth investigating in network neuroscience and highlight a selection of current and future works.
-(Bessadok 2015)
-
-
-
-
