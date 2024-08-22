@@ -69,7 +69,6 @@ fc_old_matrix = np.array(fc_content['old'])
 
 
 # Check feasibility of the matrices
-# to do
 
 
 
@@ -117,45 +116,129 @@ plt.tight_layout()
 plt.show()
 """
 
+#------------------------------------#
+
 # Community Detection
 
 import networkx as nx
 import community as community_louvain
+from scipy.stats import zscore
 
 
 # Preprocessing the matrices 
 
-# DID NOT SOLVE BAD NODE DEGREEEE
-
-
-
+# Thresholding of the FC matrices to remove weak or spurious connections
 def preprocess_fc_matrix(matrix, threshold=0.5):
     """Preprocess the FC matrix to apply thresholding while keeping significant negative weights."""
     # Apply threshold to the absolute values of the weights
-    matrix[np.abs(matrix) < threshold] = 0
-    
+    matrix[np.abs(matrix) < threshold] = 0 
     return matrix
 
+# Initialize empty arrays to store the preprocessed FC matrices
+fc_young_matrix_preprocessed = np.empty_like(fc_young_matrix)
+fc_adult_matrix_preprocessed = np.empty_like(fc_adult_matrix)
+fc_old_matrix_preprocessed = np.empty_like(fc_old_matrix)
 
-fc_young_matrix_preprocessed = [preprocess_fc_matrix(fc_young_matrix[:, :, i]) for i in range(5)]
+# Apply the preprocessing function
+for i in range(fc_young_matrix.shape[2]):
+    fc_young_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_young_matrix[:, :, i])
+    fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i])
+    fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i])
+
+# print("Difference in SC Young Matrix:", sc_young_matrix[:, :, 0] - sc_young_matrix_preprocessed[:, :, 0])print("Original FC Young Matrix:", fc_young_matrix[:, :, 0])
+# print("Preprocessed FC Young Matrix:", fc_young_matrix_preprocessed[:, :, 0])
+
+# Normalization of the SC matrices 
+def preprocess_sc_matrix(matrix, method='zscore'):
+    """Normalize the SC matrix."""
+    if method == 'zscore':
+        # Flatten the matrix to apply z-score normalization
+        flat_matrix = matrix.flatten()
+        # Apply z-score normalization
+        normalized_flat_matrix = zscore(flat_matrix)
+        # Reshape back to the original matrix shape
+        normalized_matrix = normalized_flat_matrix.reshape(matrix.shape)
+    elif method == 'global_mean':
+        # Normalize the matrix by dividing by the global mean
+        global_mean = np.mean(matrix)
+        normalized_matrix = matrix / global_mean
+    else:
+        raise ValueError("Unsupported normalization method")
+    return normalized_matrix
+
+# Initialize empty arrays to store the preprocessed SC matrices
+sc_young_matrix_preprocessed = np.empty_like(sc_young_matrix)
+sc_adult_matrix_preprocessed = np.empty_like(sc_adult_matrix)
+sc_old_matrix_preprocessed = np.empty_like(sc_old_matrix)
+
+# Apply the preprocessing function
+for i in range(sc_young_matrix.shape[2]):
+    sc_young_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_young_matrix[:, :, i], method='zscore')
+    sc_adult_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_adult_matrix[:, :, i], method='zscore')
+    sc_old_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_old_matrix[:, :, i], method='zscore')
+
+# print("Original SC Young Matrix:", sc_young_matrix[:, :, 0])
+# print("Preprocessed SC Young Matrix:", sc_young_matrix_preprocessed[:, :, 0])
+
+
+# Scaling of matrices to remove negative weights (for Louvain method)
+def rescale_matrix(matrix):
+    """Rescale the matrix to the range [0, 1]."""
+    min_val = np.min(matrix)
+    max_val = np.max(matrix)
+    # Min-max scaling
+    rescaled_matrix = (matrix - min_val) / (max_val - min_val)
+    return rescaled_matrix
+
+# Rescale the preprocessed FC matrices
+for i in range(fc_young_matrix_preprocessed.shape[2]):
+    fc_young_matrix_preprocessed[:, :, i] = rescale_matrix(fc_young_matrix_preprocessed[:, :, i])
+    fc_adult_matrix_preprocessed[:, :, i] = rescale_matrix(fc_adult_matrix_preprocessed[:, :, i])
+    fc_old_matrix_preprocessed[:, :, i] = rescale_matrix(fc_old_matrix_preprocessed[:, :, i])
+
+# Rescale the preprocessed SC matrices
+for i in range(sc_young_matrix_preprocessed.shape[2]):
+    sc_young_matrix_preprocessed[:, :, i] = rescale_matrix(sc_young_matrix_preprocessed[:, :, i])
+    sc_adult_matrix_preprocessed[:, :, i] = rescale_matrix(sc_adult_matrix_preprocessed[:, :, i])
+    sc_old_matrix_preprocessed[:, :, i] = rescale_matrix(sc_old_matrix_preprocessed[:, :, i])
 
 
 # Convert matrices to graphs
 def matrix_to_graph(matrix):
     """Convert a matrix to a graph."""
     # matrix = np.array(matrix)
-    graph = nx.from_numpy_array(matrix)
+    graph = nx.from_numpy_array(matrix) 
     return graph
 
-sc_young_graph = [matrix_to_graph(sc_young_matrix[:, :, i]) for i in range(5)]
-sc_adult_graph = [matrix_to_graph(sc_adult_matrix[:, :, i]) for i in range(5)]
-sc_old_graph = [matrix_to_graph(sc_old_matrix[:, :, i]) for i in range(5)]
+# Apply the conversion function to the preprocessed matrices
+sc_young_graph = [matrix_to_graph(sc_young_matrix_preprocessed[:, :, i]) for i in range(5)]
+sc_adult_graph = [matrix_to_graph(sc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
+sc_old_graph = [matrix_to_graph(sc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
 
-fc_young_graph = [matrix_to_graph(fc_young_matrix[:, :, i]) for i in range(5)]
-fc_adult_graph = [matrix_to_graph(fc_adult_matrix[:, :, i]) for i in range(5)]
-fc_old_graph = [matrix_to_graph(fc_old_matrix[:, :, i]) for i in range(5)]
+fc_young_graph = [matrix_to_graph(fc_young_matrix_preprocessed[:,:,i]) for i in range(5)]
+fc_adult_graph = [matrix_to_graph(fc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
+fc_old_graph = [matrix_to_graph(fc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
 
 
+# Print details of the graphs
+def print_graph_details(graph):
+    print("Edge Weights:")
+    for u, v, weight in graph.edges(data='weight'):
+        print(f"Edge ({u}, {v}): {weight}")
+
+    print("\nNode:")
+    for node, degree in graph.degree():
+        print(f"Node {node}: {degree}")
+
+
+# Print details for each graph
+"""
+for i, graph in enumerate(fc_young_graph):
+    print(f"\nGraph {i+1} Details:")
+    print_graph_details(graph)
+"""
+
+#print_graph_details(fc_young_graph[0])
 
 
 # Visualize the graphs
@@ -176,6 +259,9 @@ plt.show()
 """
 
 # Community detection using Louvain method
+
+#to do: Louvain resolution parameters
+
 def community_detection(graph):
     """Detect communities in a graph using Louvain method."""
     # Remove nodes with zero degree
@@ -184,11 +270,17 @@ def community_detection(graph):
     # Remove self-loops
     graph.remove_edges_from(nx.selfloop_edges(graph))
 
+    # Ensure the graph is connected (remove small disconnected components)
+    if not nx.is_connected(graph):
+        # Get the largest connected component
+        largest_cc = max(nx.connected_components(graph), key=len)
+        graph = graph.subgraph(largest_cc).copy()
+
     partition = community_louvain.best_partition(graph)
     return partition
 
+#sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
 """
-sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
 sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
 sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
 """
@@ -196,9 +288,8 @@ sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
 # BAD NODE DEGREE
 
 
-
+#fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
 """
-fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
 fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph]
 fc_old_partition = [community_detection(graph) for graph in fc_old_graph]
 
@@ -211,7 +302,5 @@ def plot_communities_on_axis(graph, partition, ax, title):
     pos = nx.spring_layout(graph)
     cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
     nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray')
-
-
 
 
