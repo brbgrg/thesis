@@ -127,12 +127,27 @@ from scipy.stats import zscore
 
 # Preprocessing the matrices 
 
-# Thresholding of the FC matrices to remove weak or spurious connections
-def preprocess_fc_matrix(matrix, threshold=0.5):
-    """Preprocess the FC matrix to apply thresholding while keeping significant negative weights."""
-    # Apply threshold to the absolute values of the weights
+def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
+    """Preprocess the FC matrix to apply thresholding and normalization."""
+    # Apply threshold to the absolute values of the weights to remove weak connections
     matrix[np.abs(matrix) < threshold] = 0 
-    return matrix
+    
+    # Normalize the matrix based on the selected method
+    if method == 'zscore':
+        # Flatten the matrix to apply z-score normalization
+        flat_matrix = matrix.flatten()
+        # Apply z-score normalization
+        normalized_flat_matrix = zscore(flat_matrix)
+        # Reshape back to the original matrix shape
+        normalized_matrix = normalized_flat_matrix.reshape(matrix.shape)
+    elif method == 'global_mean':
+        # Normalize the matrix by dividing by the global mean
+        global_mean = np.mean(matrix)
+        normalized_matrix = matrix / global_mean
+    else:
+        raise ValueError("Unsupported normalization method")
+    
+    return normalized_matrix
 
 # Initialize empty arrays to store the preprocessed FC matrices
 fc_young_matrix_preprocessed = np.empty_like(fc_young_matrix)
@@ -181,7 +196,7 @@ for i in range(sc_young_matrix.shape[2]):
 # print("Preprocessed SC Young Matrix:", sc_young_matrix_preprocessed[:, :, 0])
 
 
-# Scaling of matrices to remove negative weights (for Louvain method)
+# Scaling of matrices to the range [0, 1] 
 def rescale_matrix(matrix):
     """Rescale the matrix to the range [0, 1]."""
     min_val = np.min(matrix)
@@ -279,13 +294,9 @@ def community_detection(graph):
     partition = community_louvain.best_partition(graph)
     return partition
 
-#sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
-"""
+sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
 sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
 sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
-"""
-
-# BAD NODE DEGREE
 
 
 #fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
@@ -298,9 +309,22 @@ fc_old_partition = [community_detection(graph) for graph in fc_old_graph]
 # Visualize the communities
 
 def plot_communities_on_axis(graph, partition, ax, title):
+    """ Plot the graphs with nodes colored by their community"""
     ax.set_title(title)
     pos = nx.spring_layout(graph)
     cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
     nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray')
 
+
+# Plot the graphs with communities
+fig, axs = plt.subplots(1, 5, figsize=(20, 4))
+
+for i, graph in enumerate(sc_young_graph):
+    plot_communities_on_axis(graph, sc_young_partition[i], axs[i], f"Young SC Graph {i+1}")
+
+plt.tight_layout()
+plt.show()
+
+
+# What observations can we make from the community detection results?
 
