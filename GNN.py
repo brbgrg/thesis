@@ -1,5 +1,4 @@
 import numpy as np
-
 import scipy.io
 import matplotlib.pyplot as plt
 
@@ -68,14 +67,11 @@ fc_adult_matrix = np.array(fc_content['adult'])
 fc_old_matrix = np.array(fc_content['old'])
 
 
-# Check feasibility of the matrices
-
-
+# TODO: Check feasibility of the matrices
 
 
 
 # Print the type and shape of the matrices
-
 """
 print("sc_young_matrix:", type(sc_young_matrix), sc_young_matrix.shape) # <class 'numpy.ndarray'> (200, 200, 5)
 print("sc_adult_matrix:", type(sc_adult_matrix), sc_adult_matrix.shape) # <class 'numpy.ndarray'> (200, 200, 5)
@@ -116,6 +112,8 @@ plt.tight_layout()
 plt.show()
 """
 
+# TODO: Check if the matrices are normalized
+
 #------------------------------------#
 
 # Community Detection
@@ -126,12 +124,11 @@ from scipy.stats import zscore
 
 
 # Preprocessing the matrices 
-
 def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
     """Preprocess the FC matrix to apply thresholding and normalization."""
-    # Apply threshold to the absolute values of the weights to remove weak connections
+    # Thresholding to remove weak connections
     matrix[np.abs(matrix) < threshold] = 0 
-    
+
     # Normalize the matrix based on the selected method
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
@@ -160,7 +157,7 @@ for i in range(fc_young_matrix.shape[2]):
     fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i])
     fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i])
 
-# print("Difference in SC Young Matrix:", sc_young_matrix[:, :, 0] - sc_young_matrix_preprocessed[:, :, 0])print("Original FC Young Matrix:", fc_young_matrix[:, :, 0])
+# print("Original FC Young Matrix:", fc_young_matrix[:, :, 0])
 # print("Preprocessed FC Young Matrix:", fc_young_matrix_preprocessed[:, :, 0])
 
 # Normalization of the SC matrices 
@@ -275,7 +272,7 @@ plt.show()
 
 # Community detection using Louvain method
 
-#to do: Louvain resolution parameters
+#TODO: Louvain resolution parameters
 
 def community_detection(graph):
     """Detect communities in a graph using Louvain method."""
@@ -294,16 +291,14 @@ def community_detection(graph):
     partition = community_louvain.best_partition(graph)
     return partition
 
+"""
 sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
 sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
 sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
 
-
-#fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
-"""
+fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
 fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph]
 fc_old_partition = [community_detection(graph) for graph in fc_old_graph]
-
 """
 
 # Visualize the communities
@@ -317,6 +312,7 @@ def plot_communities_on_axis(graph, partition, ax, title):
 
 
 # Plot the graphs with communities
+"""
 fig, axs = plt.subplots(1, 5, figsize=(20, 4))
 
 for i, graph in enumerate(sc_young_graph):
@@ -324,7 +320,8 @@ for i, graph in enumerate(sc_young_graph):
 
 plt.tight_layout()
 plt.show()
+"""
 
+# TODO: Community Detection Evaluation
 
-# What observations can we make from the community detection results?
 
