@@ -1,0 +1,37 @@
+\documentclass{sapthesis} % or another class as per your university's requirements
+
+% Include packages
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[backend=biber,style=alphabetic]{biblatex} % Use biblatex with biber backend
+
+% Add bibliography file
+\addbibresource{bibliography/bibliography.bib}
+
+\begin{document}
+
+% Title page
+\title{Your Thesis Title}
+\author{Your Name}
+\date{Month Year}
+\maketitle
+
+% Abstract
+\begin{abstract}
+Your abstract here.
+% This is a citation \cite{author2020}.
+\end{abstract}
+
+% Table of contents
+\tableofcontents
+
+% Chapters
+\input{chapters/chapter1.tex}
+%\input{chapters/chapter2.tex}
+% Add more chapters as needed
+
+% Bibliography
+%\printbibliography
+
+\end{document}

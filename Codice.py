@@ -83,7 +83,9 @@ print("fc_old_matrix:", type(fc_old_matrix), fc_old_matrix.shape) # <class 'nump
 """
 
 # Visualize the matrices
-"""
+
+# TODO: add colorbar
+
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
 for i in range(5):
@@ -110,7 +112,7 @@ for i in range(5):
 
 plt.tight_layout()
 plt.show()
-"""
+
 
 # TODO: Check if the matrices are normalized
 
