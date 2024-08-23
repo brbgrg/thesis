@@ -1,7 +1,0 @@
-1. [Connectome Programs | Blueprint (nih.gov)](https://neuroscienceblueprint.nih.gov/human-connectome/connectome-programs)
-2. [HCP Tutorial #1: Downloading the Data — Andy's Brain Book 1.0 documentation (andysbrainbook.readthedocs.io)](https://andysbrainbook.readthedocs.io/en/latest/HCP/HCP_1_DownloadData.html)
-3. [Human Connectome Project |  Data](http://www.humanconnectomeproject.org/data/)
-4. [Human Connectome Project |  Data](http://www.humanconnectomeproject.org/data/)
-5. [ConnectomeDB (humanconnectome.org)](https://db.humanconnectome.org/app/template/Login.vm;jsessionid=ACB8563877EFEA7C17ACEA9C821B3327)
-6. [ConnectomeDB (humanconnectome.org)](https://db.humanconnectome.org/app/template/Login.vm;jsessionid=ACB8563877EFEA7C17ACEA9C821B3327)
-7. [ConnectomeDB projects](https://humanconnectome.org/connectomeDB/help)
