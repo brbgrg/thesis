@@ -1,18 +1,21 @@
 import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
+import os
 
 def load_mat_file(path):
     """Load a .mat file and return the loaded data."""
     data = scipy.io.loadmat(path)
     return data
 
-def visualize_matrix(matrix, title="Matrix Visualization"):
-    """Visualize a 2D matrix."""
-    plt.imshow(matrix, cmap='viridis')
-    plt.colorbar()
-    plt.title(title)
-    plt.show()
+# Function to save figures
+def save_figure(fig, filename):
+    directory = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\figures"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    fig.savefig(os.path.join(directory, filename))
+
+
 
 # TODO: create configuration file
 # TODO: create docker file
@@ -24,6 +27,13 @@ fc_data_path = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\brain_net\FC4al
 
 sc_data = load_mat_file(sc_data_path)
 fc_data = load_mat_file(fc_data_path)
+
+
+# TODO: create a function that taken in input sc_data, fc_data extracts the content
+
+#TODO: function to visualize FC and SC as heatmap
+
+#TODO: add save_figure to each plot
 
 
 # Print the type of sc_data and fc_data 
@@ -83,7 +93,7 @@ print("fc_old_matrix:", type(fc_old_matrix), fc_old_matrix.shape) # <class 'nump
 
 """
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
-fig.suptitle('Non-Standardized SC Matrices', fontsize=16)
+fig.suptitle('SC Matrices', fontsize=16)
 
 for i in range(5):
     im = axs[0, i].imshow(sc_young_matrix[:, :, i], cmap='viridis')
@@ -105,7 +115,7 @@ plt.show()
 # Visualize the non-preprocessed FC matrices as a heatmap
 """
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
-fig.suptitle('Non-Standardized FC Matrices', fontsize=16)
+fig.suptitle('FC Matrices', fontsize=16)
 
 for i in range(5):
     im = axs[0, i].imshow(fc_young_matrix[:, :, i], cmap='viridis')
@@ -211,18 +221,17 @@ from scipy.stats import zscore
 
 
 
-
 def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
     """Preprocess the FC matrix to set negative weights to zero, apply a threshold, normalize and scale"""
     # Make a copy of the matrix to avoid in-place modification
     matrix_copy = matrix.copy()
 
     # Set negative weights to zero
-    matrix_copy = np.maximum(matrix_copy, 0)
+    matrix_copy[matrix_copy < 0] = 0
+
     # Apply thresholding
     matrix_copy[matrix_copy < threshold] = 0
-    normalized_matrix = matrix_copy
-    """
+    #normalized_matrix = matrix_copy
     # Normalize the matrix based on the selected method
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
@@ -237,7 +246,7 @@ def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
         normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
-    """
+    
     # Apply min-max scaling to ensure values are in the range [0, 1]
     min_val = np.min(normalized_matrix)
     max_val = np.max(normalized_matrix)
@@ -256,8 +265,8 @@ fc_old_matrix_preprocessed = np.empty_like(fc_old_matrix)
 
 for i in range(fc_young_matrix.shape[2]):
     fc_young_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_young_matrix[:, :, i], threshold= 0.5, method='zscore')
-    fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i], threshold= 0.5, method='global_mean')
-    fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i], threshold= 0.5, method='global_mean')
+    fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i], threshold= 0.5, method='zscore')
+    fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i], threshold= 0.5, method='zscore')
 
 
 # Plot the histogram of the FC matrix values
@@ -269,13 +278,17 @@ upper_tri_fc_matrix = np.triu(fc_young_matrix[:, :, 0],k=1)
 flattened_fc_matrix = upper_tri_fc_matrix.flatten()
 
 # Calculate the mean and standard deviation
+"""
 mean_fc = np.mean(flattened_fc_matrix)
 std_fc = np.std(flattened_fc_matrix)
 
 print(f"Mean of the original FC matrix values: {mean_fc}")
 print(f"Standard deviation of the original FC matrix values: {std_fc}")
+"""
 
 # Plot the histogram of the original FC matrix values
+
+"""
 plt.subplot(1, 2, 1)
 plt.hist(flattened_fc_matrix, bins=100, edgecolor='k')
 plt.title('Histogram of Original FC Matrix Values')
@@ -303,7 +316,7 @@ plt.ylabel('Frequency')
 
 plt.tight_layout()
 plt.show()
-
+"""
 
 
 # Normalization of the SC matrices 
@@ -311,8 +324,8 @@ def preprocess_sc_matrix(matrix, method='zscore'):
     """Preprocess the SC matrix to apply normalization and min-max scaling."""
     # Make a copy of the matrix to avoid in-place modification
     matrix_copy = matrix.copy()
-    normalized_matrix = matrix_copy
-    """
+    #normalized_matrix = matrix_copy
+    
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
         flat_matrix = matrix_copy.flatten()
@@ -326,7 +339,7 @@ def preprocess_sc_matrix(matrix, method='zscore'):
         normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
-    """
+    
     # Apply min-max scaling to ensure values are in the range [0, 1]
     min_val = np.min(normalized_matrix)
     max_val = np.max(normalized_matrix)
@@ -352,7 +365,7 @@ for i in range(sc_young_matrix.shape[2]):
 
 # Plot the histogram of the SC matrix values
 
-
+"""
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 fig.suptitle('Histogram of SC Matrix Values', fontsize=16)
 
@@ -380,7 +393,7 @@ axs[1].set_ylabel('Frequency')
 
 plt.tight_layout()
 plt.show()
-
+"""
 
 
 
@@ -427,7 +440,6 @@ plt.show()
 """
 
 
-
 # Convert matrices to graphs
 def matrix_to_graph(matrix):
     """Convert a matrix to a graph."""
@@ -459,7 +471,9 @@ fc_old_graph_preprocessed = [matrix_to_graph(fc_old_matrix_preprocessed[:, :, i]
 
 # Visualize the original graphs
 
+
 def plot_graph_on_axis(graph, ax, title):
+    """Plot a graph on a given axis with node sizes proportional to the degree and edge widths proportional to the edge weights."""
     ax.set_title(title)
     # Extract edge weights
     edge_weights = [graph[u][v]['weight'] for u, v in graph.edges()]
@@ -470,8 +484,22 @@ def plot_graph_on_axis(graph, ax, title):
         edge_weights = [(w - min_weight) / (max_weight - min_weight) for w in edge_weights]
     else:
         edge_weights = [1 for _ in edge_weights]  # If all weights are the same, set them to 1
-    # Draw the graph with edge widths proportional to weights
-    nx.draw(graph, ax=ax, with_labels=False, node_color='skyblue', node_size=1, edge_color='gray', width=edge_weights)
+
+    # Calculate the degree of each node
+    degrees = dict(graph.degree())
+    
+    # Normalize the degrees to the range 0-1
+    max_degree = max(degrees.values())
+    min_degree = min(degrees.values())
+    normalized_degrees = {node: (degree - min_degree) / (max_degree - min_degree) for node, degree in degrees.items()}
+    
+    # Set node sizes based on normalized degrees
+    node_sizes = [(normalized_degrees[node] + 0.1) * 5 for node in graph.nodes()]  
+    
+    # Draw the graph
+    pos = nx.spring_layout(graph)  # You can choose a different layout if you prefer
+    nx.draw(graph, pos, ax=ax, node_size=node_sizes, with_labels=False, node_color='steelblue', edge_color='gray', width=edge_weights)
+    
 
 
 # Visualize the original SC graphs
@@ -490,6 +518,7 @@ plt.show()
 
 
 # Visualize the preprocessed graphs
+"""
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
 for i in range(5):
@@ -500,10 +529,11 @@ for i in range(5):
 plt.suptitle('Preprocessed SC Graphs', fontsize=16)
 plt.tight_layout()
 plt.show()
-
+"""
 
 # Visualize the original FC graphs
 
+"""
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
 for i in range(5):
@@ -517,6 +547,7 @@ plt.show()
 
 
 # Visualize the preprocessed FC graphs
+
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
 for i in range(5):
@@ -527,6 +558,69 @@ for i in range(5):
 plt.suptitle('Preprocessed FC Graphs', fontsize=16)
 plt.tight_layout()
 plt.show()
+"""
+
+# Louvain Preprocessing
+
+def louvain_preprocessing(graph):
+    # Remove nodes with zero degree
+    graph.remove_nodes_from(list(nx.isolates(graph)))
+
+    # Remove self-loops
+    graph.remove_edges_from(nx.selfloop_edges(graph))
+
+    # Remove edges with weight 0
+    zero_edges = [(u, v) for u, v, d in graph.edges(data=True) if d.get('weight', 1) == 0]
+    graph.remove_edges_from(zero_edges)
+
+    # Ensure the graph is connected (remove small disconnected components)
+    if not nx.is_connected(graph):
+        # Get the largest connected component
+        largest_cc = max(nx.connected_components(graph), key=len)
+        graph = graph.subgraph(largest_cc).copy()
+    
+    return graph
+
+# Apply the Louvain preprocessing function to the preprocessed FC graphs
+fc_young_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_young_graph_preprocessed]
+fc_adult_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_adult_graph_preprocessed]
+fc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_old_graph_preprocessed]
+
+# Apply the Louvain preprocessing function to the preprocessed SC graphs
+sc_young_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in sc_young_graph_preprocessed]
+sc_adult_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in sc_adult_graph_preprocessed]
+sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in sc_old_graph_preprocessed]
+
+# Visualize Louvain preprocessed graphs
+
+# Visualize the Louvain preprocessed SC graphs
+"""
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(sc_young_graph_preprocessed_louvain[i], axs[0, i], f"Young SC Graph Preprocessed Louvain {i+1}")
+    plot_graph_on_axis(sc_adult_graph_preprocessed_louvain[i], axs[1, i], f"Adult SC Graph Preprocessed Louvain {i+1}")
+    plot_graph_on_axis(sc_old_graph_preprocessed_louvain[i], axs[2, i], f"Old SC Graph Preprocessed Louvain {i+1}")
+
+plt.suptitle('Preprocessed SC Graphs with Louvain Preprocessing', fontsize=16)
+plt.tight_layout()
+plt.show()
+"""
+
+# Visualize the Louvain preprocessed FC graphs
+"""
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(fc_young_graph_preprocessed_louvain[i], axs[0, i], f"Young FC Graph Preprocessed Louvain {i+1}")
+    plot_graph_on_axis(fc_adult_graph_preprocessed_louvain[i], axs[1, i], f"Adult FC Graph Preprocessed Louvain {i+1}")
+    plot_graph_on_axis(fc_old_graph_preprocessed_louvain[i], axs[2, i], f"Old FC Graph Preprocessed Louvain {i+1}")
+
+plt.suptitle('Preprocessed FC Graphs with Louvain Preprocessing', fontsize=16)
+plt.tight_layout()
+plt.show()
+"""
+
 
 
 # Community detection using Louvain method
@@ -535,30 +629,17 @@ plt.show()
 
 def community_detection(graph):
     """Detect communities in a graph using Louvain method."""
-    # Remove nodes with zero degree
-    graph.remove_nodes_from(list(nx.isolates(graph)))
-
-    # Remove self-loops
-    graph.remove_edges_from(nx.selfloop_edges(graph))
-
-    # Ensure the graph is connected (remove small disconnected components)
-    if not nx.is_connected(graph):
-        # Get the largest connected component
-        largest_cc = max(nx.connected_components(graph), key=len)
-        graph = graph.subgraph(largest_cc).copy()
-
     partition = community_louvain.best_partition(graph)
     return partition
 
-"""
-sc_young_partition = [community_detection(graph) for graph in sc_young_graph]
-sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph]
-sc_old_partition = [community_detection(graph) for graph in sc_old_graph]
+sc_young_partition = [community_detection(graph) for graph in sc_young_graph_preprocessed_louvain]
+sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph_preprocessed_louvain]
+sc_old_partition = [community_detection(graph) for graph in sc_old_graph_preprocessed_louvain]
 
-fc_young_partition = [community_detection(graph) for graph in fc_young_graph]
-fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph]
-fc_old_partition = [community_detection(graph) for graph in fc_old_graph]
-"""
+fc_young_partition = [community_detection(graph) for graph in fc_young_graph_preprocessed_louvain]
+fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph_preprocessed_louvain]
+fc_old_partition = [community_detection(graph) for graph in fc_old_graph_preprocessed_louvain]
+
 
 # Visualize the communities
 
@@ -575,34 +656,42 @@ def plot_communities_on_axis(graph, partition, ax, title):
 
 # Plot the graphs with communities
 
-"""
-# Create subplots for all age groups and modalities
-fig, axs = plt.subplots(3, 5, figsize=(20, 12))
-fig.suptitle('Community Detection with Louvain algorithm', fontsize=16)
 
-# Plot SC graphs for young, adult, and old age groups
-for i, graph in enumerate(sc_young_graph):
+# Visualize SC graphs with communities
+
+"""
+fig, axs = plt.subplots(3, 5, figsize=(20, 12))
+fig.suptitle('Community Detection in SC Louvain Preprocessed Graphs', fontsize=16)
+
+# Plot SC preprocessed Louvain graphs for young, adult, and old age groups
+for i, graph in enumerate(sc_young_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, sc_young_partition[i], axs[0, i], f"Young SC Graph {i+1}")
-for i, graph in enumerate(sc_adult_graph):
+for i, graph in enumerate(sc_adult_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, sc_adult_partition[i], axs[1, i], f"Adult SC Graph {i+1}")
-for i, graph in enumerate(sc_old_graph):
+for i, graph in enumerate(sc_old_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, sc_old_partition[i], axs[2, i], f"Old SC Graph {i+1}")
 
-# Create a new figure for FC graphs
-fig, axs = plt.subplots(3, 5, figsize=(20, 12))
-fig.suptitle('Community Detection in FC Graphs', fontsize=16)
+plt.tight_layout()
+plt.show()
 
-# Plot FC graphs for young, adult, and old age groups
-for i, graph in enumerate(fc_young_graph):
+    
+# Visualize FC preprocessed Louvain graphs with communities
+
+fig, axs = plt.subplots(3, 5, figsize=(20, 12))
+fig.suptitle('Community Detection in FC Louvain Preprocessed Graphs', fontsize=16)
+
+# Plot FC preprocessed Louvain graphs for young, adult, and old age groups
+for i, graph in enumerate(fc_young_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, fc_young_partition[i], axs[0, i], f"Young FC Graph {i+1}")
-for i, graph in enumerate(fc_adult_graph):
+for i, graph in enumerate(fc_adult_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, fc_adult_partition[i], axs[1, i], f"Adult FC Graph {i+1}")
-for i, graph in enumerate(fc_old_graph):
+for i, graph in enumerate(fc_old_graph_preprocessed_louvain):
     plot_communities_on_axis(graph, fc_old_partition[i], axs[2, i], f"Old FC Graph {i+1}")
 
 plt.tight_layout()
 plt.show()
 """
+
 
 # TODO: Community Detection Evaluation
 
