@@ -67,9 +67,6 @@ fc_adult_matrix = np.array(fc_content['adult'])
 fc_old_matrix = np.array(fc_content['old'])
 
 
-# TODO: Check feasibility of the matrices
-
-
 
 # Print the type and shape of the matrices
 """
@@ -82,39 +79,96 @@ print("fc_adult_matrix:", type(fc_adult_matrix), fc_adult_matrix.shape) # <class
 print("fc_old_matrix:", type(fc_old_matrix), fc_old_matrix.shape) # <class 'numpy.ndarray'> (200, 200, 5)
 """
 
-# Visualize the matrices
+# Visualize the non-preprocessed SC matrices as a heatmap
 
-# TODO: add colorbar
-
+"""
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+fig.suptitle('Non-Standardized SC Matrices', fontsize=16)
 
 for i in range(5):
-    axs[0, i].imshow(sc_young_matrix[:, :, i], cmap='viridis')
+    im = axs[0, i].imshow(sc_young_matrix[:, :, i], cmap='viridis')
     axs[0, i].set_title(f"Young SC Matrix {i+1}")
-    axs[1, i].imshow(sc_adult_matrix[:, :, i], cmap='viridis')
+    fig.colorbar(im, ax=axs[0, i])
+    
+    im = axs[1, i].imshow(sc_adult_matrix[:, :, i], cmap='viridis')
     axs[1, i].set_title(f"Adult SC Matrix {i+1}")
-    axs[2, i].imshow(sc_old_matrix[:, :, i], cmap='viridis')
+    fig.colorbar(im, ax=axs[1, i])
+    
+    im = axs[2, i].imshow(sc_old_matrix[:, :, i], cmap='viridis')
     axs[2, i].set_title(f"Old SC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[2, i])
 
 plt.tight_layout()
 plt.show()
+"""
 
-
+# Visualize the non-preprocessed FC matrices as a heatmap
+"""
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+fig.suptitle('Non-Standardized FC Matrices', fontsize=16)
 
 for i in range(5):
-    axs[0, i].imshow(fc_young_matrix[:, :, i], cmap='viridis')
+    im = axs[0, i].imshow(fc_young_matrix[:, :, i], cmap='viridis')
     axs[0, i].set_title(f"Young FC Matrix {i+1}")
-    axs[1, i].imshow(fc_adult_matrix[:, :, i], cmap='viridis')
+    fig.colorbar(im, ax=axs[0, i])
+    
+    im = axs[1, i].imshow(fc_adult_matrix[:, :, i], cmap='viridis')
     axs[1, i].set_title(f"Adult FC Matrix {i+1}")
-    axs[2, i].imshow(fc_old_matrix[:, :, i], cmap='viridis')
+    fig.colorbar(im, ax=axs[1, i])
+    
+    im = axs[2, i].imshow(fc_old_matrix[:, :, i], cmap='viridis')
     axs[2, i].set_title(f"Old FC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[2, i])
 
 plt.tight_layout()
 plt.show()
+"""
 
+# Check feasibility of the matrices
+
+def check_symetric(matrix):
+    """Check if a matrix is symmetric."""
+    return np.allclose(matrix, matrix.T)
+
+def check_zero_diagonal(matrix):
+    """Check if the diagonal of a matrix is zero."""
+    return np.allclose(np.diag(matrix), 0)
+
+def check_dimensions(matrix, expected_shape = (200, 200)):
+    """Check if the matrix has the expected shape."""
+    return matrix.shape == expected_shape
+
+
+# Check the properties of the SC matrices
+
+def check_properties(matrix, age_group, matrix_type):
+    symmetric = [check_symetric(matrix[:, :, i]) for i in range(5)]
+    zero_diagonal = [check_zero_diagonal(matrix[:, :, i]) for i in range(5)]
+    correct_shape = [check_dimensions(matrix[:, :, i], (200, 200)) for i in range(5)]
+    
+    print(f"{matrix_type} {age_group} Symmetric: {symmetric}")
+    print(f"{matrix_type} {age_group} Zero Diagonal: {zero_diagonal}")
+    print(f"{matrix_type} {age_group} Correct Shape: {correct_shape}")
+    
+    return symmetric, zero_diagonal, correct_shape
+
+# Check properties of SC matrices
+"""
+sc_young_symmetric, sc_young_zero_diagonal, sc_young_correct_shape = check_properties(sc_young_matrix, "Young", "SC")
+sc_adult_symmetric, sc_adult_zero_diagonal, sc_adult_correct_shape = check_properties(sc_adult_matrix, "Adult", "SC")
+sc_old_symmetric, sc_old_zero_diagonal, sc_old_correct_shape = check_properties(sc_old_matrix, "Old", "SC")
+"""
+
+# Check properties of FC matrices
+"""
+fc_young_symmetric, fc_young_zero_diagonal, fc_young_correct_shape = check_properties(fc_young_matrix, "Young", "FC")
+fc_adult_symmetric, fc_adult_zero_diagonal, fc_adult_correct_shape = check_properties(fc_adult_matrix, "Adult", "FC")
+fc_old_symmetric, fc_old_zero_diagonal, fc_old_correct_shape = check_properties(fc_old_matrix, "Old", "FC")
+"""
 
 # TODO: Check if the matrices are normalized
+
+
 
 #------------------------------------#
 
@@ -125,28 +179,73 @@ import community as community_louvain
 from scipy.stats import zscore
 
 
-# Preprocessing the matrices 
-def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
-    """Preprocess the FC matrix to apply thresholding and normalization."""
-    # Thresholding to remove weak connections
-    matrix[np.abs(matrix) < threshold] = 0 
 
+# TODO: Graph metrics
+
+# Degree Distribution
+# Hub Identification
+# Cluster Coefficient
+# Path Length
+# Small Worldness
+# Rich Club Coefficient
+# Modularity
+# Density
+# Assortativity
+# Centrality Measures (Degree, Betweenness, Closeness, Eigenvector)
+# Community Detection
+# Network Resilience
+# Network Robustness
+# Network Efficiency
+# Network Entropy
+# Network Synchronization
+# Network Dynamics
+# Network Connectivity
+# Network Hubs
+# Network Motifs
+# Network Embedding
+
+
+
+
+# Preprocessing the matrices 
+
+
+
+
+def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
+    """Preprocess the FC matrix to set negative weights to zero, apply a threshold, normalize and scale"""
+    # Make a copy of the matrix to avoid in-place modification
+    matrix_copy = matrix.copy()
+
+    # Set negative weights to zero
+    matrix_copy = np.maximum(matrix_copy, 0)
+    # Apply thresholding
+    matrix_copy[matrix_copy < threshold] = 0
+    normalized_matrix = matrix_copy
+    """
     # Normalize the matrix based on the selected method
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
-        flat_matrix = matrix.flatten()
+        flat_matrix = matrix_copy.flatten()
         # Apply z-score normalization
         normalized_flat_matrix = zscore(flat_matrix)
         # Reshape back to the original matrix shape
-        normalized_matrix = normalized_flat_matrix.reshape(matrix.shape)
+        normalized_matrix = normalized_flat_matrix.reshape(matrix_copy.shape)
     elif method == 'global_mean':
         # Normalize the matrix by dividing by the global mean
-        global_mean = np.mean(matrix)
-        normalized_matrix = matrix / global_mean
+        global_mean = np.mean(matrix_copy)
+        normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
+    """
+    # Apply min-max scaling to ensure values are in the range [0, 1]
+    min_val = np.min(normalized_matrix)
+    max_val = np.max(normalized_matrix)
+    rescaled_matrix = (normalized_matrix - min_val) / (max_val - min_val)
     
-    return normalized_matrix
+    return rescaled_matrix
+
+
 
 # Initialize empty arrays to store the preprocessed FC matrices
 fc_young_matrix_preprocessed = np.empty_like(fc_young_matrix)
@@ -154,31 +253,86 @@ fc_adult_matrix_preprocessed = np.empty_like(fc_adult_matrix)
 fc_old_matrix_preprocessed = np.empty_like(fc_old_matrix)
 
 # Apply the preprocessing function
-for i in range(fc_young_matrix.shape[2]):
-    fc_young_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_young_matrix[:, :, i])
-    fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i])
-    fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i])
 
-# print("Original FC Young Matrix:", fc_young_matrix[:, :, 0])
-# print("Preprocessed FC Young Matrix:", fc_young_matrix_preprocessed[:, :, 0])
+for i in range(fc_young_matrix.shape[2]):
+    fc_young_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_young_matrix[:, :, i], threshold= 0.5, method='zscore')
+    fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i], threshold= 0.5, method='global_mean')
+    fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i], threshold= 0.5, method='global_mean')
+
+
+# Plot the histogram of the FC matrix values
+
+
+# Extract the upper triangular part of the original FC matrix, excluding the diagonal
+upper_tri_fc_matrix = np.triu(fc_young_matrix[:, :, 0],k=1)
+# Flatten the upper triangular part
+flattened_fc_matrix = upper_tri_fc_matrix.flatten()
+
+# Calculate the mean and standard deviation
+mean_fc = np.mean(flattened_fc_matrix)
+std_fc = np.std(flattened_fc_matrix)
+
+print(f"Mean of the original FC matrix values: {mean_fc}")
+print(f"Standard deviation of the original FC matrix values: {std_fc}")
+
+# Plot the histogram of the original FC matrix values
+plt.subplot(1, 2, 1)
+plt.hist(flattened_fc_matrix, bins=100, edgecolor='k')
+plt.title('Histogram of Original FC Matrix Values')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Extract the upper triangular part of the preprocessed FC matrix, excluding the diagonal
+upper_tri_fc_matrix_preprocessed = np.triu(fc_young_matrix_preprocessed[:, :, 0], k=1)
+# Flatten the upper triangular part
+flattened_fc_matrix_preprocessed = upper_tri_fc_matrix_preprocessed.flatten()
+
+# Calculate the mean and standard deviation
+mean_fc_preprocessed = np.mean(flattened_fc_matrix_preprocessed)
+std_fc_preprocessed = np.std(flattened_fc_matrix_preprocessed)
+
+print(f"Mean of the preprocessed FC matrix values: {mean_fc_preprocessed}")
+print(f"Standard deviation of the preprocessed FC matrix values: {std_fc_preprocessed}")
+
+# Plot the histogram of the preprocessed FC matrix values
+plt.subplot(1, 2, 2)
+plt.hist(flattened_fc_matrix_preprocessed, bins=100, edgecolor='k')
+plt.title('Histogram of Preprocessed FC Matrix Values')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+
 
 # Normalization of the SC matrices 
 def preprocess_sc_matrix(matrix, method='zscore'):
-    """Normalize the SC matrix."""
+    """Preprocess the SC matrix to apply normalization and min-max scaling."""
+    # Make a copy of the matrix to avoid in-place modification
+    matrix_copy = matrix.copy()
+    normalized_matrix = matrix_copy
+    """
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
-        flat_matrix = matrix.flatten()
+        flat_matrix = matrix_copy.flatten()
         # Apply z-score normalization
         normalized_flat_matrix = zscore(flat_matrix)
         # Reshape back to the original matrix shape
-        normalized_matrix = normalized_flat_matrix.reshape(matrix.shape)
+        normalized_matrix = normalized_flat_matrix.reshape(matrix_copy.shape)
     elif method == 'global_mean':
         # Normalize the matrix by dividing by the global mean
-        global_mean = np.mean(matrix)
-        normalized_matrix = matrix / global_mean
+        global_mean = np.mean(matrix_copy)
+        normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
-    return normalized_matrix
+    """
+    # Apply min-max scaling to ensure values are in the range [0, 1]
+    min_val = np.min(normalized_matrix)
+    max_val = np.max(normalized_matrix)
+    rescaled_matrix = (normalized_matrix - min_val) / (max_val - min_val)
+    
+    return rescaled_matrix
 
 # Initialize empty arrays to store the preprocessed SC matrices
 sc_young_matrix_preprocessed = np.empty_like(sc_young_matrix)
@@ -191,30 +345,87 @@ for i in range(sc_young_matrix.shape[2]):
     sc_adult_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_adult_matrix[:, :, i], method='zscore')
     sc_old_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_old_matrix[:, :, i], method='zscore')
 
-# print("Original SC Young Matrix:", sc_young_matrix[:, :, 0])
-# print("Preprocessed SC Young Matrix:", sc_young_matrix_preprocessed[:, :, 0])
+
+#print(f"Number of nonzero entries in sc_young_matrix[:, :, 0]: {np.count_nonzero(sc_young_matrix[:, :, 0])}")
+#print(f"Number of nonzero entries in sc_young_matrix_preprocessed[:, :, 0]: {np.count_nonzero(sc_young_matrix_preprocessed[:, :, 0])}")
 
 
-# Scaling of matrices to the range [0, 1] 
-def rescale_matrix(matrix):
-    """Rescale the matrix to the range [0, 1]."""
-    min_val = np.min(matrix)
-    max_val = np.max(matrix)
-    # Min-max scaling
-    rescaled_matrix = (matrix - min_val) / (max_val - min_val)
-    return rescaled_matrix
+# Plot the histogram of the SC matrix values
 
-# Rescale the preprocessed FC matrices
-for i in range(fc_young_matrix_preprocessed.shape[2]):
-    fc_young_matrix_preprocessed[:, :, i] = rescale_matrix(fc_young_matrix_preprocessed[:, :, i])
-    fc_adult_matrix_preprocessed[:, :, i] = rescale_matrix(fc_adult_matrix_preprocessed[:, :, i])
-    fc_old_matrix_preprocessed[:, :, i] = rescale_matrix(fc_old_matrix_preprocessed[:, :, i])
 
-# Rescale the preprocessed SC matrices
-for i in range(sc_young_matrix_preprocessed.shape[2]):
-    sc_young_matrix_preprocessed[:, :, i] = rescale_matrix(sc_young_matrix_preprocessed[:, :, i])
-    sc_adult_matrix_preprocessed[:, :, i] = rescale_matrix(sc_adult_matrix_preprocessed[:, :, i])
-    sc_old_matrix_preprocessed[:, :, i] = rescale_matrix(sc_old_matrix_preprocessed[:, :, i])
+fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+fig.suptitle('Histogram of SC Matrix Values', fontsize=16)
+
+# Extract the upper triangular part of the original SC matrix, excluding the diagonal
+upper_tri_sc_matrix = np.triu(sc_young_matrix[:, :, 0], k=1)
+# Flatten the upper triangular part
+flattened_sc_matrix = upper_tri_sc_matrix.flatten()
+
+# Plot the histogram of the original SC matrix values
+axs[0].hist(flattened_sc_matrix, bins=100, edgecolor='k')
+axs[0].set_title('Original SC Matrix')
+axs[0].set_xlabel('Value')
+axs[0].set_ylabel('Frequency')
+
+# Extract the upper triangular part of the preprocessed SC matrix, excluding the diagonal
+upper_tri_sc_matrix_preprocessed = np.triu(sc_young_matrix_preprocessed[:, :, 0], k=1)
+# Flatten the upper triangular part
+flattened_sc_matrix_preprocessed = upper_tri_sc_matrix_preprocessed.flatten()
+
+# Plot the histogram of the preprocessed SC matrix values
+axs[1].hist(flattened_sc_matrix_preprocessed, bins=100, edgecolor='k')
+axs[1].set_title('Preprocessed SC Matrix')
+axs[1].set_xlabel('Value')
+axs[1].set_ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+# Visualize the preprocessed FC matrices as a heatmap
+"""
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+fig.suptitle('Preprocessed FC Matrices', fontsize=16)
+
+for i in range(5):
+    im = axs[0, i].imshow(fc_young_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[0, i].set_title(f"Young FC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[0, i])
+    
+    im = axs[1, i].imshow(fc_adult_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[1, i].set_title(f"Adult FC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[1, i])
+    
+    im = axs[2, i].imshow(fc_old_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[2, i].set_title(f"Old FC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[2, i])
+
+plt.tight_layout()
+plt.show()
+
+# Visualize the preprocessed SC matrices as a heatmap
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+fig.suptitle('Preprocessed SC Matrices', fontsize=16)
+
+for i in range(5):
+    im = axs[0, i].imshow(sc_young_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[0, i].set_title(f"Young SC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[0, i])
+    
+    im = axs[1, i].imshow(sc_adult_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[1, i].set_title(f"Adult SC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[1, i])
+    
+    im = axs[2, i].imshow(sc_old_matrix_preprocessed[:, :, i], cmap='viridis')
+    axs[2, i].set_title(f"Old SC Matrix {i+1}")
+    fig.colorbar(im, ax=axs[2, i])
+
+plt.tight_layout()
+plt.show()
+"""
+
 
 
 # Convert matrices to graphs
@@ -224,42 +435,47 @@ def matrix_to_graph(matrix):
     graph = nx.from_numpy_array(matrix) 
     return graph
 
+
+# Apply the conversion function to the original matrices
+sc_young_graph = [matrix_to_graph(sc_young_matrix[:, :, i]) for i in range(5)]
+sc_adult_graph = [matrix_to_graph(sc_adult_matrix[:, :, i]) for i in range(5)]
+sc_old_graph = [matrix_to_graph(sc_old_matrix[:, :, i]) for i in range(5)]
+
+fc_young_graph = [matrix_to_graph(fc_young_matrix[:,:,i]) for i in range(5)]
+fc_adult_graph = [matrix_to_graph(fc_adult_matrix[:, :, i]) for i in range(5)]
+fc_old_graph = [matrix_to_graph(fc_old_matrix[:, :, i]) for i in range(5)]
+
+
 # Apply the conversion function to the preprocessed matrices
-sc_young_graph = [matrix_to_graph(sc_young_matrix_preprocessed[:, :, i]) for i in range(5)]
-sc_adult_graph = [matrix_to_graph(sc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
-sc_old_graph = [matrix_to_graph(sc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
+sc_young_graph_preprocessed = [matrix_to_graph(sc_young_matrix_preprocessed[:, :, i]) for i in range(5)]
+sc_adult_graph_preprocessed = [matrix_to_graph(sc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
+sc_old_graph_preprocessed = [matrix_to_graph(sc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
 
-fc_young_graph = [matrix_to_graph(fc_young_matrix_preprocessed[:,:,i]) for i in range(5)]
-fc_adult_graph = [matrix_to_graph(fc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
-fc_old_graph = [matrix_to_graph(fc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
-
-
-# Print details of the graphs
-def print_graph_details(graph):
-    print("Edge Weights:")
-    for u, v, weight in graph.edges(data='weight'):
-        print(f"Edge ({u}, {v}): {weight}")
-
-    print("\nNode:")
-    for node, degree in graph.degree():
-        print(f"Node {node}: {degree}")
+fc_young_graph_preprocessed = [matrix_to_graph(fc_young_matrix_preprocessed[:,:,i]) for i in range(5)]
+fc_adult_graph_preprocessed = [matrix_to_graph(fc_adult_matrix_preprocessed[:, :, i]) for i in range(5)]
+fc_old_graph_preprocessed = [matrix_to_graph(fc_old_matrix_preprocessed[:, :, i]) for i in range(5)]
 
 
-# Print details for each graph
-"""
-for i, graph in enumerate(fc_young_graph):
-    print(f"\nGraph {i+1} Details:")
-    print_graph_details(graph)
-"""
 
-#print_graph_details(fc_young_graph[0])
+# Visualize the original graphs
 
-
-# Visualize the graphs
-"""
 def plot_graph_on_axis(graph, ax, title):
     ax.set_title(title)
-    nx.draw(graph, ax = ax, with_labels=False, node_color='skyblue', node_size=1, edge_color='gray')
+    # Extract edge weights
+    edge_weights = [graph[u][v]['weight'] for u, v in graph.edges()]
+    # Apply min-max normalization
+    min_weight = min(edge_weights)
+    max_weight = max(edge_weights)
+    if min_weight != max_weight:  # Avoid division by zero
+        edge_weights = [(w - min_weight) / (max_weight - min_weight) for w in edge_weights]
+    else:
+        edge_weights = [1 for _ in edge_weights]  # If all weights are the same, set them to 1
+    # Draw the graph with edge widths proportional to weights
+    nx.draw(graph, ax=ax, with_labels=False, node_color='skyblue', node_size=1, edge_color='gray', width=edge_weights)
+
+
+# Visualize the original SC graphs
+
 
 fig, axs = plt.subplots(3, 5, figsize=(15, 9))
 
@@ -268,9 +484,50 @@ for i in range(5):
     plot_graph_on_axis(sc_adult_graph[i], axs[1, i], f"Adult SC Graph {i+1}")
     plot_graph_on_axis(sc_old_graph[i], axs[2, i], f"Old SC Graph {i+1}")
 
+plt.suptitle('Original SC Graphs', fontsize=16)
 plt.tight_layout()
 plt.show()
-"""
+
+
+# Visualize the preprocessed graphs
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(sc_young_graph_preprocessed[i], axs[0, i], f"Young SC Graph Preprocessed {i+1}")
+    plot_graph_on_axis(sc_adult_graph_preprocessed[i], axs[1, i], f"Adult SC Graph Preprocessed {i+1}")
+    plot_graph_on_axis(sc_old_graph_preprocessed[i], axs[2, i], f"Old SC Graph Preprocessed {i+1}")
+
+plt.suptitle('Preprocessed SC Graphs', fontsize=16)
+plt.tight_layout()
+plt.show()
+
+
+# Visualize the original FC graphs
+
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(fc_young_graph[i], axs[0, i], f"Young FC Graph {i+1}")
+    plot_graph_on_axis(fc_adult_graph[i], axs[1, i], f"Adult FC Graph {i+1}")
+    plot_graph_on_axis(fc_old_graph[i], axs[2, i], f"Old FC Graph {i+1}")
+
+plt.suptitle('Original FC Graphs', fontsize=16)
+plt.tight_layout()
+plt.show()
+
+
+# Visualize the preprocessed FC graphs
+fig, axs = plt.subplots(3, 5, figsize=(15, 9))
+
+for i in range(5):
+    plot_graph_on_axis(fc_young_graph_preprocessed[i], axs[0, i], f"Young FC Graph Preprocessed {i+1}")
+    plot_graph_on_axis(fc_adult_graph_preprocessed[i], axs[1, i], f"Adult FC Graph Preprocessed {i+1}")
+    plot_graph_on_axis(fc_old_graph_preprocessed[i], axs[2, i], f"Old FC Graph Preprocessed {i+1}")
+
+plt.suptitle('Preprocessed FC Graphs', fontsize=16)
+plt.tight_layout()
+plt.show()
+
 
 # Community detection using Louvain method
 
@@ -310,15 +567,38 @@ def plot_communities_on_axis(graph, partition, ax, title):
     ax.set_title(title)
     pos = nx.spring_layout(graph)
     cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
-    nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray')
+    # Extract edge weights
+    edge_weights = [graph[u][v].get('weight', 1.0) for u, v in graph.edges()]
+    # Use edge weights as edge widths
+    nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray', width=edge_weights)
 
 
 # Plot the graphs with communities
-"""
-fig, axs = plt.subplots(1, 5, figsize=(20, 4))
 
+"""
+# Create subplots for all age groups and modalities
+fig, axs = plt.subplots(3, 5, figsize=(20, 12))
+fig.suptitle('Community Detection with Louvain algorithm', fontsize=16)
+
+# Plot SC graphs for young, adult, and old age groups
 for i, graph in enumerate(sc_young_graph):
-    plot_communities_on_axis(graph, sc_young_partition[i], axs[i], f"Young SC Graph {i+1}")
+    plot_communities_on_axis(graph, sc_young_partition[i], axs[0, i], f"Young SC Graph {i+1}")
+for i, graph in enumerate(sc_adult_graph):
+    plot_communities_on_axis(graph, sc_adult_partition[i], axs[1, i], f"Adult SC Graph {i+1}")
+for i, graph in enumerate(sc_old_graph):
+    plot_communities_on_axis(graph, sc_old_partition[i], axs[2, i], f"Old SC Graph {i+1}")
+
+# Create a new figure for FC graphs
+fig, axs = plt.subplots(3, 5, figsize=(20, 12))
+fig.suptitle('Community Detection in FC Graphs', fontsize=16)
+
+# Plot FC graphs for young, adult, and old age groups
+for i, graph in enumerate(fc_young_graph):
+    plot_communities_on_axis(graph, fc_young_partition[i], axs[0, i], f"Young FC Graph {i+1}")
+for i, graph in enumerate(fc_adult_graph):
+    plot_communities_on_axis(graph, fc_adult_partition[i], axs[1, i], f"Adult FC Graph {i+1}")
+for i, graph in enumerate(fc_old_graph):
+    plot_communities_on_axis(graph, fc_old_partition[i], axs[2, i], f"Old FC Graph {i+1}")
 
 plt.tight_layout()
 plt.show()

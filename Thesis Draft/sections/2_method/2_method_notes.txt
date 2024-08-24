@@ -1,0 +1,15 @@
+1. Handling Negative Weights in FC Matrices
+Reference: Smith, S. M., Fox, P. T., Miller, K. L., Glahn, D. C., Fox, P. M., Mackay, C. E., ... & Beckmann, C. F. (2009). Correspondence of the brain's functional architecture during activation and rest. Proceedings of the National Academy of Sciences, 106(31), 13040-13045.
+Summary: This paper discusses the treatment of negative correlations in functional connectivity matrices, particularly in resting-state fMRI studies. It emphasizes the importance of handling negative weights appropriately, often by setting them to zero or considering their absolute value when they represent meaningful anti-correlations.
+2. Z-Score Normalization for FC and SC Matrices
+Reference: Zalesky, A., Fornito, A., & Bullmore, E. T. (2010). Network-based statistic: Identifying differences in brain networks. Neuroimage, 53(4), 1197-1207.
+Summary: This paper discusses methods for normalizing connectivity matrices, including z-score normalization, to standardize connectivity values across subjects and conditions. Z-score normalization is particularly useful when comparing networks with different overall connectivity strengths.
+3. Global Mean Normalization in Connectivity Analysis
+Reference: Honey, C. J., Thivierge, J. P., & Sporns, O. (2010). Can structure predict function in the human brain? Neuroimage, 52(3), 766-776.
+Summary: This study examines the relationship between structural and functional connectivity and discusses normalization techniques such as global mean normalization, which adjusts connectivity matrices relative to the average connectivity strength to ensure comparability across different subjects or datasets.
+4. Min-Max Scaling for Network Comparability
+Reference: Sotiropoulos, S. N., & Zalesky, A. (2019). Building connectomes using diffusion MRI: why, how and but. NMR in Biomedicine, 32(4), e3752.
+Summary: This review discusses various preprocessing steps for building and comparing brain connectomes, including the use of min-max scaling to ensure that different connectivity matrices are brought onto a comparable scale, which is particularly important for subsequent network analysis like community detection or network alignment.
+5. Network Alignment and Cross-Modality Comparisons
+Reference: Wang, Y., Xu, T., Jiang, L., & Liu, Z. (2019). Link prediction approach to assess the accuracy of structural connectome. Scientific Reports, 9(1), 1-11.
+Summary: This paper explores the importance of preprocessing steps like normalization and scaling in the context of aligning structural and functional networks. The authors emphasize that consistent preprocessing across modalities is critical for accurate network alignment and comparison.
