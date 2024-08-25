@@ -125,12 +125,13 @@ def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, 
     plt.close(fig)
 
 
+"""
 # Visualize the original SC matrices as a heatmap
 plot_and_save_heatmap(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_heatmap.png')
 
 # Visualize the original FC matrices as a heatmap
 plot_and_save_heatmap(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_heatmap.png')
-
+"""
 
 
 # Plot the histogram 
@@ -185,13 +186,13 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
     
     plt.close(fig)
 
-
+"""
 # Plot the histogram of the original FC matrix values
 plot_and_save_histogram(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_histogram.png')
 
 # Plot the histogram of the original SC matrix values
 plot_and_save_histogram(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_histogram.png')
-
+"""
 
     
  
@@ -316,7 +317,6 @@ def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
     return rescaled_matrix
 
 
-
 # Initialize empty arrays to store the preprocessed FC matrices
 fc_young_matrix_preprocessed = np.empty_like(fc_young_matrix)
 fc_adult_matrix_preprocessed = np.empty_like(fc_adult_matrix)
@@ -329,56 +329,6 @@ for i in range(fc_young_matrix.shape[2]):
     fc_adult_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_adult_matrix[:, :, i], threshold= 0.5, method='zscore')
     fc_old_matrix_preprocessed[:, :, i] = preprocess_fc_matrix(fc_old_matrix[:, :, i], threshold= 0.5, method='zscore')
 
-
-# Plot the histogram of the FC matrix values
-
-
-# Extract the upper triangular part of the original FC matrix, excluding the diagonal
-upper_tri_fc_matrix = np.triu(fc_young_matrix[:, :, 0],k=1)
-# Flatten the upper triangular part
-flattened_fc_matrix = upper_tri_fc_matrix.flatten()
-
-# Calculate the mean and standard deviation
-"""
-mean_fc = np.mean(flattened_fc_matrix)
-std_fc = np.std(flattened_fc_matrix)
-
-print(f"Mean of the original FC matrix values: {mean_fc}")
-print(f"Standard deviation of the original FC matrix values: {std_fc}")
-"""
-
-# Plot the histogram of the original FC matrix values
-
-
-"""
-plt.subplot(1, 2, 1)
-plt.hist(flattened_fc_matrix, bins=100, edgecolor='k')
-plt.title('Histogram of Original FC Matrix Values')
-plt.xlabel('Value')
-plt.ylabel('Frequency')
-
-# Extract the upper triangular part of the preprocessed FC matrix, excluding the diagonal
-upper_tri_fc_matrix_preprocessed = np.triu(fc_young_matrix_preprocessed[:, :, 0], k=1)
-# Flatten the upper triangular part
-flattened_fc_matrix_preprocessed = upper_tri_fc_matrix_preprocessed.flatten()
-
-# Calculate the mean and standard deviation
-mean_fc_preprocessed = np.mean(flattened_fc_matrix_preprocessed)
-std_fc_preprocessed = np.std(flattened_fc_matrix_preprocessed)
-
-print(f"Mean of the preprocessed FC matrix values: {mean_fc_preprocessed}")
-print(f"Standard deviation of the preprocessed FC matrix values: {std_fc_preprocessed}")
-
-# Plot the histogram of the preprocessed FC matrix values
-plt.subplot(1, 2, 2)
-plt.hist(flattened_fc_matrix_preprocessed, bins=100, edgecolor='k')
-plt.title('Histogram of Preprocessed FC Matrix Values')
-plt.xlabel('Value')
-plt.ylabel('Frequency')
-
-plt.tight_layout()
-plt.show()
-"""
 
 
 # Normalization of the SC matrices 
@@ -421,7 +371,7 @@ for i in range(sc_young_matrix.shape[2]):
     sc_old_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_old_matrix[:, :, i], method='zscore')
 
 
-
+"""
 # Visualize the preprocessed FC matrices as a heatmap
 plot_and_save_heatmap(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_heatmap_preprocessed.png')
 
@@ -434,7 +384,7 @@ plot_and_save_histogram(fc_young_matrix_preprocessed, fc_adult_matrix_preprocess
 
 # Plot the histogram of the preprocessed SC matrix values
 plot_and_save_histogram(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_histogram_preprocessed.png')
-
+"""
 
 
 # Convert matrices to graphs
@@ -493,7 +443,7 @@ def plot_graph_on_axis(graph, ax, title, pos = None):
     
     # Draw the graph
     if pos is None:
-        pos = nx.spring_layout(graph)
+        pos = nx.spring_layout(graph, seed=42)
     nx.draw(graph, pos, ax=ax, node_size=node_sizes, with_labels=False, node_color='steelblue', edge_color='gray', width=edge_weights)
 
     return pos
@@ -514,7 +464,11 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     fig.suptitle(f'{title_prefix} Graphs', fontsize=16)
 
     for i in range(5):
-        pos = plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", pos)
+        if positions:
+            pos = positions[i]
+            plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", pos)
+        else:
+            pos = plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}")
         plot_graph_on_axis(adult_graphs[i], axs[1, i], f"Adult {title_prefix} Graph {i+1}", pos)
         plot_graph_on_axis(old_graphs[i], axs[2, i], f"Old {title_prefix} Graph {i+1}", pos)
 
@@ -526,19 +480,21 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     
     plt.close(fig)
 
+    return positions
 
+"""
 # Visualize the original SC graphs
-plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
+positions_sc = plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
 
 # Visualize the preprocessed SC graphs
-plot_and_save_graph(sc_young_graph_preprocessed, sc_adult_graph_preprocessed, sc_old_graph_preprocessed, 'SC', 'SC_graphs_preprocessed.png')
+plot_and_save_graph(sc_young_graph_preprocessed, sc_adult_graph_preprocessed, sc_old_graph_preprocessed, 'SC', 'SC_graphs_preprocessed.png', positions_sc)
 
 # Visualize the original FC graphs
-plot_and_save_graph(fc_young_graph, fc_adult_graph, fc_old_graph, 'FC', 'FC_graphs.png')
+positions_fc = plot_and_save_graph(fc_young_graph, fc_adult_graph, fc_old_graph, 'FC', 'FC_graphs.png', positions_sc)
 
 # Visualize the preprocessed FC graphs
-plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png')
-
+plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png', positions_fc)
+"""
 
 
 
@@ -579,13 +535,22 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 # Visualize Louvain preprocessed graphs
 
+
+
+
+# TODO: apply plot_and_save_graph to the Louvain preprocessed graphs using node positions but removing the positions of deleted nodes
+
+
+
+
 # Visualize the Louvain preprocessed SC graphs
+"""
 plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png')
 
 
 # Visualize the Louvain preprocessed FC graphs
 plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png')
-
+"""
 
 # Community detection using Louvain method
 
