@@ -463,12 +463,16 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     fig, axs = plt.subplots(3, 5, figsize=(15, 9))
     fig.suptitle(f'{title_prefix} Graphs', fontsize=16)
 
+    if positions is None:
+        positions = [] 
+
     for i in range(5):
-        if positions:
+        if positions != []:
             pos = positions[i]
             plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", pos)
         else:
             pos = plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}")
+            positions.append(pos)
         plot_graph_on_axis(adult_graphs[i], axs[1, i], f"Adult {title_prefix} Graph {i+1}", pos)
         plot_graph_on_axis(old_graphs[i], axs[2, i], f"Old {title_prefix} Graph {i+1}", pos)
 
@@ -482,7 +486,7 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
 
     return positions
 
-"""
+
 # Visualize the original SC graphs
 positions_sc = plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
 
@@ -494,7 +498,7 @@ positions_fc = plot_and_save_graph(fc_young_graph, fc_adult_graph, fc_old_graph,
 
 # Visualize the preprocessed FC graphs
 plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png', positions_fc)
-"""
+
 
 
 
@@ -535,21 +539,47 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 # Visualize Louvain preprocessed graphs
 
+def filter_positions(original_positions, graph):
+    """
+    Remove positions of nodes that are not in the graph.
+    
+    Parameters:
+    - original_positions: dict, positions of nodes in the original graph
+    - graph: NetworkX graph, the graph after preprocessing
+    
+    Returns:
+    - filtered_positions: dict, positions of nodes that are still in the graph
+    """
+    return {node: pos for node, pos in original_positions.items() if node in graph.nodes()}
 
+"""
+if positions_sc is None:
+    print("positions_sc is None")
+elif sc_young_graph_preprocessed_louvain is None:
+    print("sc_young_graph_preprocessed_louvain is None")
+else:
+    for i in range(5):
+        if positions_sc[i] is None:
+            print(f"positions_sc[{i}] is None")
+        if sc_young_graph_preprocessed_louvain[i] is None:
+            print(f"sc_young_graph_preprocessed_louvain[{i}] is None")
+"""
 
+"""
+# update positions for the Louvain preprocessed SC graphs
+positions_sc_louvain = [filter_positions(positions_sc[i], sc_young_graph_preprocessed_louvain[i]) for i in range(5)]
 
-# TODO: apply plot_and_save_graph to the Louvain preprocessed graphs using node positions but removing the positions of deleted nodes
-
-
+# update positions for the Louvain preprocessed FC graphs
+positions_fc_louvain = [filter_positions(positions_fc[i], fc_young_graph_preprocessed_louvain[i]) for i in range(5)]
 
 
 # Visualize the Louvain preprocessed SC graphs
-"""
-plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png')
+
+plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc_louvain)
 
 
 # Visualize the Louvain preprocessed FC graphs
-plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png')
+plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc_louvain)
 """
 
 # Community detection using Louvain method
