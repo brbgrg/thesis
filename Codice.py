@@ -16,7 +16,6 @@ def save_figure(fig, filename):
     fig.savefig(os.path.join(directory, filename))
 
 
-
 # TODO: create configuration file
 # TODO: create docker file
 
@@ -30,10 +29,6 @@ fc_data = load_mat_file(fc_data_path)
 
 
 # TODO: create a function that taken in input sc_data, fc_data extracts the content
-
-#TODO: function to visualize FC and SC as heatmap
-
-#TODO: add save_figure to each plot
 
 
 # Print the type of sc_data and fc_data 
@@ -125,13 +120,13 @@ def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, 
     plt.close(fig)
 
 
-"""
+
 # Visualize the original SC matrices as a heatmap
 plot_and_save_heatmap(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_heatmap.png')
 
 # Visualize the original FC matrices as a heatmap
 plot_and_save_heatmap(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_heatmap.png')
-"""
+
 
 
 # Plot the histogram 
@@ -186,13 +181,13 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
     
     plt.close(fig)
 
-"""
+
 # Plot the histogram of the original FC matrix values
 plot_and_save_histogram(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_histogram.png')
 
 # Plot the histogram of the original SC matrix values
 plot_and_save_histogram(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_histogram.png')
-"""
+
 
     
  
@@ -244,6 +239,10 @@ fc_old_symmetric, fc_old_zero_diagonal, fc_old_correct_shape = check_properties(
 
 
 
+# TODO: Graph metrics
+
+
+
 #------------------------------------#
 
 # Community Detection
@@ -254,34 +253,11 @@ from scipy.stats import zscore
 
 
 
-# TODO: Graph metrics
-
-# Degree Distribution
-# Hub Identification
-# Cluster Coefficient
-# Path Length
-# Small Worldness
-# Rich Club Coefficient
-# Modularity
-# Density
-# Assortativity
-# Centrality Measures (Degree, Betweenness, Closeness, Eigenvector)
-# Community Detection
-# Network Resilience
-# Network Robustness
-# Network Efficiency
-# Network Entropy
-# Network Synchronization
-# Network Dynamics
-# Network Connectivity
-# Network Hubs
-# Network Motifs
-# Network Embedding
-
-
-
-
 # Preprocessing the matrices 
+
+# TODO: normalization with respect to a null model (is it done already?)
+
+# TODO: denoising and sparsification?
 
 def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
     """Preprocess the FC matrix to set negative weights to zero, apply a threshold, normalize and scale"""
@@ -293,7 +269,9 @@ def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
 
     # Apply thresholding
     matrix_copy[matrix_copy < threshold] = 0
-    #normalized_matrix = matrix_copy
+    normalized_matrix = matrix_copy
+
+    """
     # Normalize the matrix based on the selected method
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
@@ -308,7 +286,7 @@ def preprocess_fc_matrix(matrix, threshold=0.5, method='zscore'):
         normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
-    
+    """
     # Apply min-max scaling to ensure values are in the range [0, 1]
     min_val = np.min(normalized_matrix)
     max_val = np.max(normalized_matrix)
@@ -336,7 +314,9 @@ def preprocess_sc_matrix(matrix, method='zscore'):
     """Preprocess the SC matrix to apply normalization and min-max scaling."""
     # Make a copy of the matrix to avoid in-place modification
     matrix_copy = matrix.copy()
-    #normalized_matrix = matrix_copy
+    normalized_matrix = matrix_copy
+
+    """
     
     if method == 'zscore':
         # Flatten the matrix to apply z-score normalization
@@ -351,6 +331,7 @@ def preprocess_sc_matrix(matrix, method='zscore'):
         normalized_matrix = matrix_copy / global_mean
     else:
         raise ValueError("Unsupported normalization method")
+    """
     
     # Apply min-max scaling to ensure values are in the range [0, 1]
     min_val = np.min(normalized_matrix)
@@ -371,7 +352,7 @@ for i in range(sc_young_matrix.shape[2]):
     sc_old_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_old_matrix[:, :, i], method='zscore')
 
 
-"""
+
 # Visualize the preprocessed FC matrices as a heatmap
 plot_and_save_heatmap(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_heatmap_preprocessed.png')
 
@@ -384,7 +365,7 @@ plot_and_save_histogram(fc_young_matrix_preprocessed, fc_adult_matrix_preprocess
 
 # Plot the histogram of the preprocessed SC matrix values
 plot_and_save_histogram(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_histogram_preprocessed.png')
-"""
+
 
 
 # Convert matrices to graphs
@@ -501,6 +482,7 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     return positions
 
 
+
 # Visualize the original SC graphs
 positions_sc = plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
 
@@ -558,13 +540,12 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 """ I don't need to filter out removed nodes's positions from positions"""
 
-"""
+
 # Visualize the Louvain preprocessed SC graphs
 plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc)
 
 # Visualize the Louvain preprocessed FC graphs
 plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc)
-"""
 
 
 
@@ -586,69 +567,22 @@ fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph_pre
 fc_old_partition = [community_detection(graph) for graph in fc_old_graph_preprocessed_louvain]
 
 
-# Visualize the communities
 
-def plot_communities_on_axis(graph, partition, ax, title):
-    """ Plot the graphs with nodes colored by their community"""
-    ax.set_title(title)
-    #pos = nx.spring_layout(graph, seed=42)
-    pos = nx.spring_layout(graph)
-    cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
-    # Extract edge weights
-    edge_weights = [graph[u][v].get('weight', 1.0) for u, v in graph.edges()]
-    # Use edge weights as edge widths
-    nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray', width=edge_weights)
-
-
+#TODO: maybe it's not the best to use the same positions for visualizing communities 
 
 # Visualize SC graphs with communities
-
-"""
-fig, axs = plt.subplots(3, 5, figsize=(20, 12))
-fig.suptitle('Community Detection in SC Louvain Preprocessed Graphs', fontsize=16)
-
-# Plot SC preprocessed Louvain graphs for young, adult, and old age groups
-for i, graph in enumerate(sc_young_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, sc_young_partition[i], axs[0, i], f"Young SC Graph {i+1}")
-for i, graph in enumerate(sc_adult_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, sc_adult_partition[i], axs[1, i], f"Adult SC Graph {i+1}")
-for i, graph in enumerate(sc_old_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, sc_old_partition[i], axs[2, i], f"Old SC Graph {i+1}")
-
-plt.tight_layout()
-plt.show()
-
-    
-# Visualize FC preprocessed Louvain graphs with communities
-
-fig, axs = plt.subplots(3, 5, figsize=(20, 12))
-fig.suptitle('Community Detection in FC Louvain Preprocessed Graphs', fontsize=16)
-
-# Plot FC preprocessed Louvain graphs for young, adult, and old age groups
-for i, graph in enumerate(fc_young_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, fc_young_partition[i], axs[0, i], f"Young FC Graph {i+1}")
-for i, graph in enumerate(fc_adult_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, fc_adult_partition[i], axs[1, i], f"Adult FC Graph {i+1}")
-for i, graph in enumerate(fc_old_graph_preprocessed_louvain):
-    plot_communities_on_axis(graph, fc_old_partition[i], axs[2, i], f"Old FC Graph {i+1}")
-
-plt.tight_layout()
-plt.show()
-"""
-
-
-# Visualize SC graphs with communities
-
 plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain_communities.png', positions_sc, [sc_young_partition, sc_adult_partition, sc_old_partition])
 
 # Visualize FC preprocessed Louvain graphs with communities 
-
 plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain_communities.png', positions_fc, [fc_young_partition, fc_adult_partition, fc_old_partition])
 
 
 
 
+# TODO: Community detection evaluation 
 
-# TODO: Community Detection Evaluation
+
+# TODO: Multilayer network construction (layer alignment with multilayer modularity optimization framework with different resolutions, resolution parameter tuning)
+
 
 
