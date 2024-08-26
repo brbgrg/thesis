@@ -417,9 +417,11 @@ fc_old_graph_preprocessed = [matrix_to_graph(fc_old_matrix_preprocessed[:, :, i]
 
 # Visualize the graphs
 
-def plot_graph_on_axis(graph, ax, title, pos = None):
-    """Plot a graph on a given axis with node sizes proportional to the degree and edge widths proportional to the edge weights."""
+def plot_graph_on_axis(graph, ax, title, pos = None, partition = None):
+    """Plot a graph on a given axis with node sizes proportional to the degree and edge widths proportional to the edge weights. 
+        If partition is provided, nodes are colored by their community."""
     ax.set_title(title)
+
     # Extract edge weights
     edge_weights = [graph[u][v]['weight'] for u, v in graph.edges()]
     # Apply min-max normalization
@@ -432,24 +434,29 @@ def plot_graph_on_axis(graph, ax, title, pos = None):
 
     # Calculate the degree of each node
     degrees = dict(graph.degree())
-    
     # Normalize the degrees to the range 0-1
     max_degree = max(degrees.values())
     min_degree = min(degrees.values())
     normalized_degrees = {node: (degree - min_degree) / (max_degree - min_degree) for node, degree in degrees.items()}
-    
     # Set node sizes based on normalized degrees
     node_sizes = [(normalized_degrees[node] + 0.1) * 5 for node in graph.nodes()]  
+
+    if partition:
+        # If partition is provided, color nodes by their community
+        cmap = plt.get_cmap('viridis', max(partition.values()) + 1)
+        node_color = list(partition.values())
+    else:
+        node_color = 'steelblue'
     
     # Draw the graph
     if pos is None:
         pos = nx.spring_layout(graph, seed=42)
-    nx.draw(graph, pos, ax=ax, node_size=node_sizes, with_labels=False, node_color='steelblue', edge_color='gray', width=edge_weights)
+    nx.draw(graph, pos, ax=ax, node_size=node_sizes, with_labels=False, node_color=node_color, cmap=cmap if partition else None, edge_color='gray', width=edge_weights)
 
     return pos
 
 
-def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, filename=None, positions = None):
+def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, filename=None, positions = None, partitions = None):
     """
     Plot and save graphs for different age groups on a grid of subplots.
     
@@ -459,22 +466,29 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     - old_graphs: List of 5 NetworkX graphs for old subjects
     - title_prefix: 'FC' or 'SC'
     - filename: name.png
+    - positions: List of positions for the graphs
+    - partitions: List of 3 lists, each containing partitions for the graphs of each age group
     """
     fig, axs = plt.subplots(3, 5, figsize=(15, 9))
     fig.suptitle(f'{title_prefix} Graphs', fontsize=16)
 
     if positions is None:
         positions = [] 
+    
+    if partitions is None:
+        partitions = [None] * 3
+        
+    # add a funciton to validate the partitions and positions lengths = 5?
 
     for i in range(5):
-        if positions != []:
+        if len(positions) > i:
             pos = positions[i]
-            plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", pos)
+            plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", pos, partitions[0][i] if partitions[0] else None)
         else:
-            pos = plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}")
+            pos = plot_graph_on_axis(young_graphs[i], axs[0, i], f"Young {title_prefix} Graph {i+1}", partition=partitions[0][i] if partitions[0] else None)
             positions.append(pos)
-        plot_graph_on_axis(adult_graphs[i], axs[1, i], f"Adult {title_prefix} Graph {i+1}", pos)
-        plot_graph_on_axis(old_graphs[i], axs[2, i], f"Old {title_prefix} Graph {i+1}", pos)
+        plot_graph_on_axis(adult_graphs[i], axs[1, i], f"Adult {title_prefix} Graph {i+1}", pos, partitions[1][i] if partitions[1] else None)
+        plot_graph_on_axis(old_graphs[i], axs[2, i], f"Old {title_prefix} Graph {i+1}", pos, partitions[2][i] if partitions[2] else None)
 
     plt.tight_layout()
     #plt.show()
@@ -507,23 +521,26 @@ plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc
 # TODO: try Louvain with only Louvain preprocessing
 
 def louvain_preprocessing(graph):
+    # Create a copy of the graph to avoid in-place modifications
+    graph_copy = graph.copy()
+
     # Remove nodes with zero degree
-    graph.remove_nodes_from(list(nx.isolates(graph)))
+    graph_copy.remove_nodes_from(list(nx.isolates(graph_copy)))
 
     # Remove self-loops
-    graph.remove_edges_from(nx.selfloop_edges(graph))
+    graph_copy.remove_edges_from(nx.selfloop_edges(graph_copy))
 
     # Remove edges with weight 0
-    zero_edges = [(u, v) for u, v, d in graph.edges(data=True) if d.get('weight', 1) == 0]
-    graph.remove_edges_from(zero_edges)
+    zero_edges = [(u, v) for u, v, d in graph_copy.edges(data=True) if d.get('weight', 1) == 0]
+    graph_copy.remove_edges_from(zero_edges)
 
     # Ensure the graph is connected (remove small disconnected components)
-    if not nx.is_connected(graph):
+    if not nx.is_connected(graph_copy):
         # Get the largest connected component
-        largest_cc = max(nx.connected_components(graph), key=len)
-        graph = graph.subgraph(largest_cc).copy()
+        largest_cc = max(nx.connected_components(graph_copy), key=len)
+        graph_copy = graph_copy.subgraph(largest_cc).copy()
     
-    return graph
+    return graph_copy
 
 # Apply the Louvain preprocessing function to the preprocessed FC graphs
 fc_young_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_young_graph_preprocessed]
@@ -539,48 +556,17 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 # Visualize Louvain preprocessed graphs
 
-def filter_positions(original_positions, graph):
-    """
-    Remove positions of nodes that are not in the graph.
-    
-    Parameters:
-    - original_positions: dict, positions of nodes in the original graph
-    - graph: NetworkX graph, the graph after preprocessing
-    
-    Returns:
-    - filtered_positions: dict, positions of nodes that are still in the graph
-    """
-    return {node: pos for node, pos in original_positions.items() if node in graph.nodes()}
+""" I don't need to filter out removed nodes's positions from positions"""
 
 """
-if positions_sc is None:
-    print("positions_sc is None")
-elif sc_young_graph_preprocessed_louvain is None:
-    print("sc_young_graph_preprocessed_louvain is None")
-else:
-    for i in range(5):
-        if positions_sc[i] is None:
-            print(f"positions_sc[{i}] is None")
-        if sc_young_graph_preprocessed_louvain[i] is None:
-            print(f"sc_young_graph_preprocessed_louvain[{i}] is None")
-"""
-
-"""
-# update positions for the Louvain preprocessed SC graphs
-positions_sc_louvain = [filter_positions(positions_sc[i], sc_young_graph_preprocessed_louvain[i]) for i in range(5)]
-
-# update positions for the Louvain preprocessed FC graphs
-positions_fc_louvain = [filter_positions(positions_fc[i], fc_young_graph_preprocessed_louvain[i]) for i in range(5)]
-
-
 # Visualize the Louvain preprocessed SC graphs
-
-plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc_louvain)
-
+plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc)
 
 # Visualize the Louvain preprocessed FC graphs
-plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc_louvain)
+plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc)
 """
+
+
 
 # Community detection using Louvain method
 
@@ -613,8 +599,6 @@ def plot_communities_on_axis(graph, partition, ax, title):
     # Use edge weights as edge widths
     nx.draw(graph, pos, ax=ax, with_labels=False, node_color=list(partition.values()), node_size=1, cmap=cmap, edge_color='gray', width=edge_weights)
 
-
-# Plot the graphs with communities
 
 
 # Visualize SC graphs with communities
@@ -651,6 +635,18 @@ for i, graph in enumerate(fc_old_graph_preprocessed_louvain):
 plt.tight_layout()
 plt.show()
 """
+
+
+# Visualize SC graphs with communities
+
+plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain_communities.png', positions_sc, [sc_young_partition, sc_adult_partition, sc_old_partition])
+
+# Visualize FC preprocessed Louvain graphs with communities 
+
+plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain_communities.png', positions_fc, [fc_young_partition, fc_adult_partition, fc_old_partition])
+
+
+
 
 
 # TODO: Community Detection Evaluation
