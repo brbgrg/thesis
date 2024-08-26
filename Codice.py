@@ -9,12 +9,31 @@ def load_mat_file(path):
     return data
 
 # Function to save figures
-def save_figure(fig, filename):
+def save_figure(fig, filename, title=None):
     directory = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\figures"
+    summary_file = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\summary\summary.tex"
+
     if not os.path.exists(directory):
         os.makedirs(directory)
-    fig.savefig(os.path.join(directory, filename))
+    
+    fig_path = os.path.join(directory, filename)
+    fig.savefig(fig_path)
 
+    if title is None:
+        # Remove the file extension
+        base_name = os.path.splitext(filename)[0]
+        # Replace underscores with spaces and capitalize each word
+        title = base_name.replace('_', ' ').title()
+
+    # Add the figure to the summary file
+    with open(summary_file, 'a') as f:
+        f.write(f"\\begin{{figure}}[h!]\n")
+        f.write(f"\\centering\n")
+        f.write(f"\\includegraphics[width=0.8\\textwidth]{{{fig_path.replace('\\', '/')}}}\n")
+        f.write(f"\\caption{{{title}}}\n")
+        f.write(f"\\end{{figure}}\n\n")
+
+    plt.close(fig)
 
 # TODO: create configuration file
 # TODO: create docker file
@@ -115,7 +134,7 @@ def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, 
     #plt.show()
 
     if filename:
-        save_figure(fig, filename)
+        save_figure(fig, filename, f"Heatmap of {title_prefix} Matrices")
     
     plt.close(fig)
 
@@ -177,7 +196,7 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
     #plt.show()
     
     if filename:
-        save_figure(fig, filename)
+        save_figure(fig, filename, f'Histograms of {title_prefix} Matrices')
     
     plt.close(fig)
 
@@ -475,7 +494,7 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     #plt.show()
     
     if filename:
-        save_figure(fig, filename)
+        save_figure(fig, filename, f'{title_prefix} Graphs')
     
     plt.close(fig)
 
