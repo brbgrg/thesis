@@ -1,96 +1,122 @@
+
+\section{Introduction}
+Summary of the Python code used for processing and analyzing structural connectivity (SC) and functional connectivity (FC) matrices derived from brain network data. Various tasks were performed including loading data, preprocessing, visualization, and community detection.
+
+\section{Matrix Extraction}
+Loaded data from .mat files using the \texttt{scipy.io.loadmat} function.
+Extracted SC and FC data from the loaded .mat files and stored in variables.
+Extracted matrices for different age groups (young, adult, old) from the SC and FC data.
+
+\section{Preprocessing}
+Preprocessed matrices to set negative weights to zero, apply thresholding, and normalize.
+
+Visualized matrices as heatmaps and histograms using \texttt{matplotlib}. For example, iterated over the matrices for different age groups and displayed them using the \texttt{imshow} function with the 'viridis' colormap. Added colorbars to each subplot for better interpretation.
+
 \begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_heatmap.png}
-\caption{Heatmap of Original SC Matrices}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_heatmap.png}
+        \caption{Heatmap of Original SC Matrices}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap.png}
+        \caption{Heatmap of Original FC Matrices}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap_preprocessed.png}
+        \caption{Heatmap of Preprocessed FC Matrices}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_heatmap_preprocessed.png}
+        \caption{Heatmap of Preprocessed SC Matrices}
+    \end{subfigure}
+    
+    \caption{Various Heatmaps of SC and FC Matrices}
 \end{figure}
 
 \begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap.png}
-\caption{Heatmap of Original FC Matrices}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram.png}
+        \caption{Histogram of Original FC Matrices}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram.png}
+        \caption{Histogram of Original SC Matrices}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram_preprocessed.png}
+        \caption{Histogram of Preprocessed FC Matrices}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram_preprocessed.png}
+        \caption{Histogram of Preprocessed SC Matrices}
+    \end{subfigure}
+    
+    \caption{Various Histograms of SC and FC Matrices}
 \end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap_preprocessed.png}
-\caption{Heatmap of Preprocessed FC Matrices}
-\end{figure}
+
+\section{Conversion and Preprocessing of Graphs}
+Converted matrices to graphs using \texttt{networkx}. Preprocessed graphs by removing self-loops, isolates, and small disconnected components.
+
+\section{Community Detection}
+Applied the Louvain method for community detection on the preprocessed graphs using the \texttt{community} package.
+
+\section{Visualization of Graphs}
+Visualized and saved graphs, including those with detected communities. Used the spring layout algorithm for graph visualization to position the nodes. 
 
 \begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_heatmap_preprocessed.png}
-\caption{Heatmap of Preprocessed SC Matrices}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs.png}
+        \caption{Original SC Graphs}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs.png}
+        \caption{Original FC Graphs}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed.png}
+        \caption{Preprocessed SC Graphs}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed.png}
+        \caption{Preprocessed FC Graphs}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed_louvain.png}
+        \caption{Louvain Preprocessed SC Graphs}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed_louvain.png}
+        \caption{Louvain Preprocessed FC Graphs}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed_louvain_communities.png}
+        \caption{Louvain Preprocessed SC Graphs with Louvain Communities}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed_louvain_communities.png}
+        \caption{Louvain Preprocessed FC Graphs with Louvain Communities}
+    \end{subfigure}
+    
+    \caption{Various Graphs of SC and FC Matrices}
 \end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram.png}
-\caption{Histogram of Original FC Matrices}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram.png}
-\caption{Histogram of Original SC Matrices}
-\end{figure}
+\section{Conclusion}
+Created a pipeline for loading, preprocessing, visualizing, and analyzing SC and FC matrices. Used various visualization techniques and community detection methods for in-depth analysis of the connectivity patterns.
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram_preprocessed.png}
-\caption{Histogram of Preprocessed FC Matrices}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram_preprocessed.png}
-\caption{Histogram of Preprocessed SC Matrices}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs.png}
-\caption{Original SC Graphs}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed.png}
-\caption{Preprocessed SC Graphs}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs.png}
-\caption{Original FC Graphs}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed.png}
-\caption{Preprocessed FC Graphs}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed_louvain.png}
-\caption{Louvain Preprocessed SC Graphs}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed_louvain.png}
-\caption{Louvain Preprocessed FC Graphs}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_graphs_preprocessed_louvain_communities.png}
-\caption{Louvain Preprocessed SC Graphs with Louvain Communities}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_graphs_preprocessed_louvain_communities.png}
-\caption{Louvain Preprocessed FC Graphs with Louvain Communities}
-\end{figure}
 

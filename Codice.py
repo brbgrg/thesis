@@ -34,7 +34,7 @@ def save_figure(fig, filename, title=None):
 
     # Add the figure to the summary file
     with open(report_file, 'a') as f:
-        f.write("\\begin{figure}[h!]\n")
+        f.write("\\begin{figure}[h]\n")
         f.write("\\centering\n")
         f.write("\\includegraphics[width=0.8\\textwidth]{{{}}}\n".format(fig_path.replace('\\', '/')))
         f.write("\\caption{{{}}}\n".format(title))
