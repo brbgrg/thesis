@@ -11,7 +11,7 @@ def load_mat_file(path):
 # Function to save figures
 def save_figure(fig, filename, title=None):
     directory = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\figures"
-    summary_file = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\summary\summary.tex"
+    report_file = r'C:\Users\barbo\Desktop\thesis repo clone\thesis\Thesis Draft\reports\report1.tex'
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -25,13 +25,20 @@ def save_figure(fig, filename, title=None):
         # Replace underscores with spaces and capitalize each word
         title = base_name.replace('_', ' ').title()
 
+    # Check if the figure path is already in the file
+    fig_include_str = fig_path.replace('\\', '/')
+    with open(report_file, 'r') as f:
+        content = f.read()
+        if fig_include_str in content:
+            return
+
     # Add the figure to the summary file
-    with open(summary_file, 'a') as f:
-        f.write(f"\\begin{{figure}}[h!]\n")
-        f.write(f"\\centering\n")
-        f.write(f"\\includegraphics[width=0.8\\textwidth]{{{fig_path.replace('\\', '/')}}}\n")
-        f.write(f"\\caption{{{title}}}\n")
-        f.write(f"\\end{{figure}}\n\n")
+    with open(report_file, 'a') as f:
+        f.write("\\begin{figure}[h!]\n")
+        f.write("\\centering\n")
+        f.write("\\includegraphics[width=0.8\\textwidth]{{{}}}\n".format(fig_path.replace('\\', '/')))
+        f.write("\\caption{{{}}}\n".format(title))
+        f.write("\\end{figure}\n\n")
 
     plt.close(fig)
 
@@ -106,7 +113,7 @@ print("fc_old_matrix:", type(fc_old_matrix), fc_old_matrix.shape) # <class 'nump
 
 # Visualize matrices as a heatmap
 
-def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, filename=None):
+def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, filename=None, preprocessed = False):
     """
     Visualize the matrices as heatmaps.
     
@@ -114,8 +121,10 @@ def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, 
     - title_prefix: 'SC' or 'FC'
     - filename: name.png
     """
+    status = "Preprocessed" if preprocessed else "Original"
     fig, axs = plt.subplots(3, 5, figsize=(15, 9))
-    fig.suptitle(f'{title_prefix} Matrices', fontsize=16)
+    title = f'Heatmap of {status} {title_prefix} Matrices'
+    fig.suptitle(title, fontsize=16)
 
     for i in range(5):
         im = axs[0, i].imshow(young_matrix[:, :, i], cmap='viridis')
@@ -134,17 +143,9 @@ def plot_and_save_heatmap(young_matrix, adult_matrix, old_matrix, title_prefix, 
     #plt.show()
 
     if filename:
-        save_figure(fig, filename, f"Heatmap of {title_prefix} Matrices")
+        save_figure(fig, filename, title)
     
     plt.close(fig)
-
-
-
-# Visualize the original SC matrices as a heatmap
-plot_and_save_heatmap(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_heatmap.png')
-
-# Visualize the original FC matrices as a heatmap
-plot_and_save_heatmap(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_heatmap.png')
 
 
 
@@ -153,7 +154,7 @@ plot_and_save_heatmap(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix, filename=None):
+def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix, filename=None, preprocessed = False):
     """
     Plot and save the histogram of the upper triangular part (excluding the diagonal) of a matrix.
     
@@ -164,15 +165,17 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
     - title_prefix: 'FC' or 'SC'
     - filename: name.png
     """
+    status = "Preprocessed" if preprocessed else "Original"
+    title = f'Histogram of {status} {title_prefix} Matrices'
     fig, axs = plt.subplots(3, 5, figsize=(15, 9))
-    fig.suptitle(f'{title_prefix} Histograms', fontsize=16)
+    fig.suptitle(title, fontsize=16)
 
     for i in range(5):
         # Young group
         upper_tri_matrix = np.triu(young_matrix[:, :, i], k=1)
         flattened_matrix = upper_tri_matrix.flatten()
         axs[0, i].hist(flattened_matrix, bins=100, edgecolor='k')
-        axs[0, i].set_title(f"Young {title_prefix} Histogram {i+1}")
+        axs[0, i].set_title(f"Young {title_prefix} Matrix {i+1}")
         axs[0, i].set_xlabel('Value')
         axs[0, i].set_ylabel('Frequency')
 
@@ -180,7 +183,7 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
         upper_tri_matrix = np.triu(adult_matrix[:, :, i], k=1)
         flattened_matrix = upper_tri_matrix.flatten()
         axs[1, i].hist(flattened_matrix, bins=100, edgecolor='k')
-        axs[1, i].set_title(f"Adult {title_prefix} Histogram {i+1}")
+        axs[1, i].set_title(f"Adult {title_prefix} Matrix {i+1}")
         axs[1, i].set_xlabel('Value')
         axs[1, i].set_ylabel('Frequency')
 
@@ -188,7 +191,7 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
         upper_tri_matrix = np.triu(old_matrix[:, :, i], k=1)
         flattened_matrix = upper_tri_matrix.flatten()
         axs[2, i].hist(flattened_matrix, bins=100, edgecolor='k')
-        axs[2, i].set_title(f"Old {title_prefix} Histogram {i+1}")
+        axs[2, i].set_title(f"Old {title_prefix} Matrix {i+1}")
         axs[2, i].set_xlabel('Value')
         axs[2, i].set_ylabel('Frequency')
 
@@ -196,19 +199,10 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
     #plt.show()
     
     if filename:
-        save_figure(fig, filename, f'Histograms of {title_prefix} Matrices')
+        save_figure(fig, filename, title)
     
     plt.close(fig)
 
-
-# Plot the histogram of the original FC matrix values
-plot_and_save_histogram(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_histogram.png')
-
-# Plot the histogram of the original SC matrix values
-plot_and_save_histogram(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_histogram.png')
-
-
-    
  
 
 # Check feasibility of the matrices
@@ -372,20 +366,33 @@ for i in range(sc_young_matrix.shape[2]):
 
 
 
+# Visualize the original SC matrices as a heatmap
+plot_and_save_heatmap(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_heatmap.png')
+
+# Visualize the original FC matrices as a heatmap
+plot_and_save_heatmap(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_heatmap.png')
+
 # Visualize the preprocessed FC matrices as a heatmap
-plot_and_save_heatmap(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_heatmap_preprocessed.png')
+plot_and_save_heatmap(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_heatmap_preprocessed.png', preprocessed=True)
 
 # Visualize the preprocessed SC matrices as a heatmap
-plot_and_save_heatmap(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_heatmap_preprocessed.png')
+plot_and_save_heatmap(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_heatmap_preprocessed.png', preprocessed=True)
 
+
+
+# Plot the histogram of the original FC matrix values
+plot_and_save_histogram(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_histogram.png')
+
+# Plot the histogram of the original SC matrix values
+plot_and_save_histogram(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_histogram.png')
 
 # Plot the histogram of the preprocessed FC matrix values
-plot_and_save_histogram(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_histogram_preprocessed.png')
+plot_and_save_histogram(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed, fc_old_matrix_preprocessed, 'FC', 'FC_matrices_histogram_preprocessed.png', preprocessed=True)
 
 # Plot the histogram of the preprocessed SC matrix values
-plot_and_save_histogram(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_histogram_preprocessed.png')
+plot_and_save_histogram(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_histogram_preprocessed.png', preprocessed=True)
 
-
+    
 
 # Convert matrices to graphs
 def matrix_to_graph(matrix):
@@ -456,7 +463,7 @@ def plot_graph_on_axis(graph, ax, title, pos = None, partition = None):
     return pos
 
 
-def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, filename=None, positions = None, partitions = None):
+def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, filename=None, positions = None, partitions = None, status = "Original", with_communities = False):
     """
     Plot and save graphs for different age groups on a grid of subplots.
     
@@ -468,9 +475,12 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     - filename: name.png
     - positions: List of positions for the graphs
     - partitions: List of 3 lists, each containing partitions for the graphs of each age group
+    - status: 'Original', 'Preprocessed', or 'Louvain Preprocessed'
     """
+    community_text = " with Louvain Communities" if with_communities else ""
+    title = f'{status} {title_prefix} Graphs{community_text}'
     fig, axs = plt.subplots(3, 5, figsize=(15, 9))
-    fig.suptitle(f'{title_prefix} Graphs', fontsize=16)
+    fig.suptitle(title, fontsize=16)
 
     if positions is None:
         positions = [] 
@@ -494,7 +504,7 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     #plt.show()
     
     if filename:
-        save_figure(fig, filename, f'{title_prefix} Graphs')
+        save_figure(fig, filename, title)
     
     plt.close(fig)
 
@@ -506,13 +516,13 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
 positions_sc = plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
 
 # Visualize the preprocessed SC graphs
-plot_and_save_graph(sc_young_graph_preprocessed, sc_adult_graph_preprocessed, sc_old_graph_preprocessed, 'SC', 'SC_graphs_preprocessed.png', positions_sc)
+plot_and_save_graph(sc_young_graph_preprocessed, sc_adult_graph_preprocessed, sc_old_graph_preprocessed, 'SC', 'SC_graphs_preprocessed.png', positions_sc, status="Preprocessed")
 
 # Visualize the original FC graphs
 positions_fc = plot_and_save_graph(fc_young_graph, fc_adult_graph, fc_old_graph, 'FC', 'FC_graphs.png', positions_sc)
 
 # Visualize the preprocessed FC graphs
-plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png', positions_fc)
+plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png', positions_fc, status="Preprocessed")
 
 
 
@@ -561,10 +571,10 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 
 # Visualize the Louvain preprocessed SC graphs
-plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc)
+plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc, status="Louvain Preprocessed")
 
 # Visualize the Louvain preprocessed FC graphs
-plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc)
+plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc, status="Louvain Preprocessed")
 
 
 
@@ -590,10 +600,10 @@ fc_old_partition = [community_detection(graph) for graph in fc_old_graph_preproc
 #TODO: maybe it's not the best to use the same positions for visualizing communities 
 
 # Visualize SC graphs with communities
-plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain_communities.png', positions_sc, [sc_young_partition, sc_adult_partition, sc_old_partition])
+plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain_communities.png', positions_sc, [sc_young_partition, sc_adult_partition, sc_old_partition], status="Louvain Preprocessed", with_communities=True)
 
 # Visualize FC preprocessed Louvain graphs with communities 
-plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain_communities.png', positions_fc, [fc_young_partition, fc_adult_partition, fc_old_partition])
+plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain_communities.png', positions_fc, [fc_young_partition, fc_adult_partition, fc_old_partition], status="Louvain Preprocessed", with_communities=True)
 
 
 
