@@ -618,5 +618,15 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 
 
 
-# TODO: Multi-modal and multi-subject modularity optimization
+# Multi-modal and multi-subject modularity optimization
+
+import genlouvain
+
+num_subjects = 5
+num_nodes = 200
+num_modalities = 2  # FC and SC
+
+# Initialize the multilayer network matrix
+multilayer_network = np.zeros((num_subjects, num_nodes, num_modalities))
+
 

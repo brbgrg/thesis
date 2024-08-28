@@ -1,23 +1,16 @@
 
 \section{Introduction}
-Summary of the Python code used for processing and analyzing structural connectivity (SC) and functional connectivity (FC) matrices. Various tasks were performed including loading data, preprocessing, visualization, and community detection.
+Summary of Codice.py
 
-\section{Data Extraction}
-
-\begin{enumerate}
-    \item \textbf{Loading Data:} 
-    The data was loaded from .mat files using the \texttt{scipy.io.loadmat} function. This function reads the MATLAB files and loads the data into Python variables.
-    
-    \item \textbf{Extracting SC and FC Data:} 
-    After loading the .mat files, the SC (Structural Connectivity) and FC (Functional Connectivity) data were extracted from the loaded data structures. This was done by accessing specific keys within the loaded data that correspond to SC and FC.
-    
-    \item \textbf{Extracting Age Group Matrices:} 
-    The SC and FC data contain matrices for different age groups (young, adult, old). These matrices were extracted by accessing the specific fields within the SC and FC data structures and each age group's data was stored separately.
-\end{enumerate}
-
+\section{Data}
+The data was loaded from .mat files in a dictionary-like structure with keys corresponding to the SC and FC data.
+The SC (Structural Connectivity) and FC (Functional Connectivity) data were extracted from the dictionary and stored in separate variables. 
+The SC and FC data contain matrices for different age groups (young, adult, old). The matrices for each age group were extracted and stored in separate variables. Each matrix has dimensions of 200x200x5 (nodes x nodes x subjects). 
 
 \section{Preprocessing}
-Preprocessed matrices to set negative weights to zero, apply thresholding, and normalize.
+
+
+Preprocessed FC matrices to set negative weights to zero, apply thresholding, and normalize.
 
 Visualized matrices as heatmaps and histograms using \texttt{matplotlib}. For example, iterated over the matrices for different age groups and displayed them using the \texttt{imshow} function with the 'viridis' colormap. Added colorbars to each subplot for better interpretation.
 
@@ -115,12 +108,6 @@ Visualized and saved graphs, including those with detected communities. Used the
     
     \caption{Various Graphs of SC and FC Matrices}
 \end{figure}
-
-
-\section{Conclusion}
-Created a pipeline for loading, preprocessing, visualizing, and analyzing SC and FC matrices. Used various visualization techniques and community detection methods for in-depth analysis of the connectivity patterns.
-
-
 
 
 
