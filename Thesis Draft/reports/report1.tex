@@ -1,11 +1,20 @@
 
 \section{Introduction}
-Summary of the Python code used for processing and analyzing structural connectivity (SC) and functional connectivity (FC) matrices derived from brain network data. Various tasks were performed including loading data, preprocessing, visualization, and community detection.
+Summary of the Python code used for processing and analyzing structural connectivity (SC) and functional connectivity (FC) matrices. Various tasks were performed including loading data, preprocessing, visualization, and community detection.
 
-\section{Matrix Extraction}
-Loaded data from .mat files using the \texttt{scipy.io.loadmat} function.
-Extracted SC and FC data from the loaded .mat files and stored in variables.
-Extracted matrices for different age groups (young, adult, old) from the SC and FC data.
+\section{Data Extraction}
+
+\begin{enumerate}
+    \item \textbf{Loading Data:} 
+    The data was loaded from .mat files using the \texttt{scipy.io.loadmat} function. This function reads the MATLAB files and loads the data into Python variables.
+    
+    \item \textbf{Extracting SC and FC Data:} 
+    After loading the .mat files, the SC (Structural Connectivity) and FC (Functional Connectivity) data were extracted from the loaded data structures. This was done by accessing specific keys within the loaded data that correspond to SC and FC.
+    
+    \item \textbf{Extracting Age Group Matrices:} 
+    The SC and FC data contain matrices for different age groups (young, adult, old). These matrices were extracted by accessing the specific fields within the SC and FC data structures and each age group's data was stored separately.
+\end{enumerate}
+
 
 \section{Preprocessing}
 Preprocessed matrices to set negative weights to zero, apply thresholding, and normalize.
@@ -22,37 +31,35 @@ Visualized matrices as heatmaps and histograms using \texttt{matplotlib}. For ex
         \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap.png}
         \caption{Heatmap of Original FC Matrices}
     \end{subfigure}
-    
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap_preprocessed.png}
-        \caption{Heatmap of Preprocessed FC Matrices}
-    \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_heatmap_preprocessed.png}
         \caption{Heatmap of Preprocessed SC Matrices}
     \end{subfigure}
-    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_heatmap_preprocessed.png}
+        \caption{Heatmap of Preprocessed FC Matrices}
+    \end{subfigure}
     \caption{Various Heatmaps of SC and FC Matrices}
 \end{figure}
 
+
 \begin{figure}[h!]
     \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram.png}
+        \caption{Histogram of Original SC Matrices}
+    \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram.png}
         \caption{Histogram of Original FC Matrices}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram.png}
-        \caption{Histogram of Original SC Matrices}
+        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram_preprocessed.png}
+        \caption{Histogram of Preprocessed SC Matrices}
     \end{subfigure}
-    
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/FC_matrices_histogram_preprocessed.png}
         \caption{Histogram of Preprocessed FC Matrices}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{C:/Users/barbo/Desktop/thesis repo clone/thesis/Thesis Draft/figures/SC_matrices_histogram_preprocessed.png}
-        \caption{Histogram of Preprocessed SC Matrices}
     \end{subfigure}
     
     \caption{Various Histograms of SC and FC Matrices}

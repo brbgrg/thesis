@@ -177,7 +177,8 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
         axs[0, i].hist(flattened_matrix, bins=100, edgecolor='k')
         axs[0, i].set_title(f"Young {title_prefix} Matrix {i+1}")
         axs[0, i].set_xlabel('Value')
-        axs[0, i].set_ylabel('Frequency')
+        axs[0, i].set_ylabel('Frequency (log scale)')
+        axs[0, i].set_yscale('log')
 
         # Adult group
         upper_tri_matrix = np.triu(adult_matrix[:, :, i], k=1)
@@ -185,7 +186,8 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
         axs[1, i].hist(flattened_matrix, bins=100, edgecolor='k')
         axs[1, i].set_title(f"Adult {title_prefix} Matrix {i+1}")
         axs[1, i].set_xlabel('Value')
-        axs[1, i].set_ylabel('Frequency')
+        axs[1, i].set_ylabel('Frequency (log scale)')
+        axs[1, i].set_yscale('log')
 
         # Old group
         upper_tri_matrix = np.triu(old_matrix[:, :, i], k=1)
@@ -193,7 +195,8 @@ def plot_and_save_histogram(young_matrix, adult_matrix, old_matrix, title_prefix
         axs[2, i].hist(flattened_matrix, bins=100, edgecolor='k')
         axs[2, i].set_title(f"Old {title_prefix} Matrix {i+1}")
         axs[2, i].set_xlabel('Value')
-        axs[2, i].set_ylabel('Frequency')
+        axs[2, i].set_ylabel('Frequency (log scale)')
+        axs[2, i].set_yscale('log')
 
     plt.tight_layout()
     #plt.show()
@@ -614,4 +617,6 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 # TODO: Multilayer network construction (layer alignment with multilayer modularity optimization framework with different resolutions, resolution parameter tuning)
 
 
+
+# TODO: Multi-modal and multi-subject modularity optimization
 
