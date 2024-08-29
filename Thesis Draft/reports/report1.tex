@@ -1,18 +1,17 @@
 
-\section{Introduction}
-Summary of Codice.py
+\section{Dataset}
 
-\section{Data}
-The data was loaded from .mat files in a dictionary-like structure with keys corresponding to the SC and FC data.
-The SC (Structural Connectivity) and FC (Functional Connectivity) data were extracted from the dictionary and stored in separate variables. 
-The SC and FC data contain matrices for different age groups (young, adult, old). The matrices for each age group were extracted and stored in separate variables. Each matrix has dimensions of 200x200x5 (nodes x nodes x subjects). 
+\subsection{Dataset Description}
+The dataset used in this study comprises structural connectivity (SC) and functional connectivity (FC) matrices 
+obtained from MRI and fMRI scans, respectively. The data is categorized into three age groups: 
+young (10 years old), adult (30 years old), and old (70 years old). Each age group contains data from 5 different subjects.
+Both SC and FC matrices have dimensions of 200 $\times$ 200 $\times$ 5 (nodes $\times$ nodes $\times$ subjects).
 
-\section{Preprocessing}
+\subsection{Data Loading and Preprocessing}
+Data was loaded from .mat files, and matrices for different age groups (young, adult, old) were extracted and stored in separate variables of size 200 $\times$ 200 $\times$ 5 (nodes $\times$ nodes $\times$ subjects).
 
-
-Preprocessed FC matrices to set negative weights to zero, apply thresholding, and normalize.
-
-Visualized matrices as heatmaps and histograms using \texttt{matplotlib}. For example, iterated over the matrices for different age groups and displayed them using the \texttt{imshow} function with the 'viridis' colormap. Added colorbars to each subplot for better interpretation.
+Preprocessed FC matrices by setting negative weights to zero and applying thresholding to remove weak connections. Applied min-max scaling to both SC and FC matrices to adjust the data within the range of [0, 1].
+Visualized heatmaps and histograms of the original and preprocessed SC and FC matrices to have a better understanding of the distribution of connectivity strengths.
 
 \begin{figure}[h!]
     \centering
@@ -59,14 +58,12 @@ Visualized matrices as heatmaps and histograms using \texttt{matplotlib}. For ex
 \end{figure}
 
 
-\section{Conversion and Preprocessing of Graphs}
-Converted matrices to graphs using \texttt{networkx}. Preprocessed graphs by removing self-loops, isolates, and small disconnected components.
-
-\section{Community Detection}
+\section{Single-Layer Community Detection}
+Converted matrices to graphs using \texttt{networkx}. 
+Preprocessed graphs by removing self-loops, isolates, and small disconnected components to ensure that Louvain algorithm identifies significant communities.
 Applied the Louvain method for community detection on the preprocessed graphs using the \texttt{community} package.
-
-\section{Visualization of Graphs}
-Visualized and saved graphs, including those with detected communities. Used the spring layout algorithm for graph visualization to position the nodes. 
+Visualized graphs derived from original and preprocessed SC and FC matrices, as well as graphs prepared for the Louvain algorithm, including those with detected communities. 
+Used the spring layout algorithm for graph visualization to position the nodes. Stored the positions to ensure consistent node placement across different figures.
 
 \begin{figure}[h!]
     \centering
