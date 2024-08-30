@@ -254,9 +254,7 @@ fc_old_symmetric, fc_old_zero_diagonal, fc_old_correct_shape = check_properties(
 # TODO: Check if the matrices are normalized
 
 
-
 # TODO: Graph metrics
-
 
 
 #------------------------------------#
@@ -271,7 +269,6 @@ from scipy.stats import zscore
 
 # Preprocessing the matrices 
 
-# TODO: normalization with respect to a null model (is it done already?)
 
 # TODO: denoising and sparsification?
 
@@ -610,23 +607,9 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 
 
 
-
 # TODO: Community detection evaluation 
 
 
-# TODO: Multilayer network construction (layer alignment with multilayer modularity optimization framework with different resolutions, resolution parameter tuning)
-
-
-
-# Multi-modal and multi-subject modularity optimization
-
-import genlouvain
-
-num_subjects = 5
-num_nodes = 200
-num_modalities = 2  # FC and SC
-
-# Initialize the multilayer network matrix
-multilayer_network = np.zeros((num_subjects, num_nodes, num_modalities))
+# TODO: Multi-modal and multi-subject modularity optimization?
 
 
