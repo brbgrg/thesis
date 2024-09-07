@@ -365,7 +365,7 @@ for i in range(sc_young_matrix.shape[2]):
     sc_old_matrix_preprocessed[:, :, i] = preprocess_sc_matrix(sc_old_matrix[:, :, i], method='zscore')
 
 
-
+"""
 # Visualize the original SC matrices as a heatmap
 plot_and_save_heatmap(sc_young_matrix, sc_adult_matrix, sc_old_matrix, 'SC', 'SC_matrices_heatmap.png')
 
@@ -377,9 +377,9 @@ plot_and_save_heatmap(fc_young_matrix_preprocessed, fc_adult_matrix_preprocessed
 
 # Visualize the preprocessed SC matrices as a heatmap
 plot_and_save_heatmap(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_heatmap_preprocessed.png', preprocessed=True)
+"""
 
-
-
+"""
 # Plot the histogram of the original FC matrix values
 plot_and_save_histogram(fc_young_matrix, fc_adult_matrix, fc_old_matrix, 'FC', 'FC_matrices_histogram.png')
 
@@ -391,7 +391,7 @@ plot_and_save_histogram(fc_young_matrix_preprocessed, fc_adult_matrix_preprocess
 
 # Plot the histogram of the preprocessed SC matrix values
 plot_and_save_histogram(sc_young_matrix_preprocessed, sc_adult_matrix_preprocessed, sc_old_matrix_preprocessed, 'SC', 'SC_matrices_histogram_preprocessed.png', preprocessed=True)
-
+"""
     
 
 # Convert matrices to graphs
@@ -511,7 +511,7 @@ def plot_and_save_graph(young_graphs, adult_graphs, old_graphs, title_prefix, fi
     return positions
 
 
-
+"""
 # Visualize the original SC graphs
 positions_sc = plot_and_save_graph(sc_young_graph, sc_adult_graph, sc_old_graph, 'SC', 'SC_graphs.png')
 
@@ -523,7 +523,7 @@ positions_fc = plot_and_save_graph(fc_young_graph, fc_adult_graph, fc_old_graph,
 
 # Visualize the preprocessed FC graphs
 plot_and_save_graph(fc_young_graph_preprocessed, fc_adult_graph_preprocessed, fc_old_graph_preprocessed, 'FC', 'FC_graphs_preprocessed.png', positions_fc, status="Preprocessed")
-
+"""
 
 
 
@@ -569,13 +569,13 @@ sc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in s
 
 """ I don't need to filter out removed nodes's positions from positions"""
 
-
+"""
 # Visualize the Louvain preprocessed SC graphs
 plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain.png', positions_sc, status="Louvain Preprocessed")
 
 # Visualize the Louvain preprocessed FC graphs
 plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain.png', positions_fc, status="Louvain Preprocessed")
-
+"""
 
 
 # Community detection using Louvain method
@@ -598,18 +598,19 @@ fc_old_partition = [community_detection(graph) for graph in fc_old_graph_preproc
 
 
 #TODO: maybe it's not the best to use the same positions for visualizing communities 
-
+"""
 # Visualize SC graphs with communities
 plot_and_save_graph(sc_young_graph_preprocessed_louvain, sc_adult_graph_preprocessed_louvain, sc_old_graph_preprocessed_louvain, 'SC', 'SC_graphs_preprocessed_louvain_communities.png', positions_sc, [sc_young_partition, sc_adult_partition, sc_old_partition], status="Louvain Preprocessed", with_communities=True)
 
 # Visualize FC preprocessed Louvain graphs with communities 
 plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preprocessed_louvain, fc_old_graph_preprocessed_louvain, 'FC', 'FC_graphs_preprocessed_louvain_communities.png', positions_fc, [fc_young_partition, fc_adult_partition, fc_old_partition], status="Louvain Preprocessed", with_communities=True)
-
-
+"""
 
 # TODO: Community detection evaluation 
-
-
 # TODO: Multi-modal and multi-subject modularity optimization?
+
+
+
+# Graph embedding (Representation Learning)
 
 
