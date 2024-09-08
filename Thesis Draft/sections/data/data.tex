@@ -16,9 +16,24 @@ the optimization) on both matrices.
 Structural connectivity (SC) matrices represent the anatomical connections between different brain regions.
 Functional connectivity (FC) matrices represent the temporal correlations between brain regions during resting state.
 
+Most existing studies focus more on structural brain networks 
+and functional brain networks, where both brain networks are 
+undirected attributed graphs with undirected edge eij between 
+vi and vj (i.e., eij ¼ eji). The difference between structural
+networks and functional networks is that the e 2 E in structural 
+networks are positive values, while they can be negative in 
+functional networks.
+Since the functional networks are constructed based on the BOLD 
+signal correlation among different brain nodes, the positive and 
+negative edges represent synchronous activation and asynchronous 
+activation among brain regions, respectively. \cite{Tang2023}.
+
+
 \section{Dataset Description}
 The dataset used in this study comprises structural connectivity (SC) and functional connectivity (FC) matrices 
 obtained from MRI and fMRI scans, respectively. The data is categorized into three age groups: 
 young (10 years old), adult (30 years old), and old (70 years old). Each age group contains data from 5 different subjects.
 Both SC and FC matrices have dimensions of 200 $\times$ 200 $\times$ 5 (nodes $\times$ nodes $\times$ subjects).
 
+Nodes are already aligned across subjects and modalities based on a 
+common parcellation scheme, so no graph matching is needed? \cite{Puxeddu2022}
