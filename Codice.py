@@ -609,7 +609,7 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 # TODO: Community detection evaluation 
 # TODO: Multi-modal and multi-subject modularity optimization?
 
-
+# TODO: visualization with BrainNet Viewer
 
 # Graph embedding (Representation Learning)
 
