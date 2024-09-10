@@ -32,6 +32,29 @@ The blood oxygenated level-dependent (BOLD) signal of functional MRI
 (fMRI) reveals the spatial and temporal brain activity across diferent
 brain regions \cite{Zhao2022}. 
 
+We first constructed the connectome of functional connectivity (FC) 
+and structural connectivity (SC) for each participant, using the a 
+priori Schaefer cortical parcellation atlas of 400 regions43. 
+
+Particularly, based on the resting-state fMRI data, FC was defined as 
+the Pearson correlation coefficients between each pair of regional 
+time series, resulting in a 400×400 symmetrical FC matrix for each 
+participant. The matrix consisted of 79,800 unique elements, with 
+each element denoted as an “edge” connecting two cortical regions. 
+Fisher r-to-z was applied to improve the normality of FC edge strength. 
+
+Meanwhile, using the diffusion MRI data, we reconstructed the whole-brain 
+white matter tracts of individual participants via probabilistic fiber 
+tractography with multi-shell, multi-tissue constrained spherical 
+deconvolution (CSD)44. Anatomically constrained tractography (ACT)45 and 
+spherical deconvolution informed filtering of tractograms (SIFT)46 were 
+applied to improve the biological accuracy of fiber reconstruction. 
+For each participant, we quantified the number of streamlines connecting 
+every pair of cortical regions from the Schaefer atlas to construct a 
+structural connectome of streamline counts. 
+The edge weights of the SC matrix were log-transformed.
+\cite{Chen2024}
+
 \section{Dataset Description}
 The dataset used in this study comprises structural connectivity (SC) and functional connectivity (FC) matrices 
 obtained from MRI and fMRI scans, respectively. The data is categorized into three age groups: 
