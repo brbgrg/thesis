@@ -1,10 +1,10 @@
 
 \section{Dataset Preprocessing}
 
-
-
-
-
+The pre-processing of the resting state fMRI data was
+performed using both FSL (https://fsl.fmrib.ox.ac.uk/fsl/
+fslwiki)and AFNI (Automated Functional Neuroimaging) (http://afni.nimh.nih.gov/afni) toolbox. 
+In brief, the pre-processing steps were as follows: \dots \cite{Zhang2022}.
 
 Functional networks are rendered as temporal correlation matrices, and anatomical networks were converted into structural 
 correlation matrices.
@@ -60,6 +60,12 @@ every pair of cortical regions from the Schaefer atlas to construct a
 structural connectome of streamline counts. 
 The edge weights of the SC matrix were log-transformed.
 \cite{Chen2024}
+
+
+We construct the fMRI brain networks by computing the edge weights
+as Pearson correlations between each pair of regional time
+series. The nodes in the networks are accordant with brain
+regions defined in the chosen brain atlas. \cite{Zhang2022}
 
 \section{Dataset Description}
 The dataset used in this study comprises structural connectivity (SC) and functional connectivity (FC) matrices 
