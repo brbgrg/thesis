@@ -45,3 +45,13 @@ for json_file_key in json_file_keys:
             # Download the file specified by the URI
             s3.download_file(bucket_name, file_uri, file_name)
             print(f'File {file_name} downloaded successfully')
+
+
+
+# preprocessing (Zhao2022a)
+#fMRI:
+# HCP minimal preprocessing pipeline [8]. 
+# The artefacts of the BOLD signal were further removed using ICA-FIX. 
+# The cortical surface was parcellated into N=360 major ROIs using MMP1.0 parcellation
+
+

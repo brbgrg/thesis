@@ -4,6 +4,30 @@ resolution of fMRI and high temporal resolution of
 MEG to achieve the highest sex classifcation performance of 85.2%.
 \cite{Zhao2022}
 
+Diffusion magnetic resonance imaging (dMRI) and functional MRI reveals the large
+scale SC across different brain regions. Electrophysiological methods (i.e.
+MEG/EEG) provide direct measures of neural activity and exhibits complex 
+neurobiological temporal dynamics which could not be solved by
+fMRI. However, most of existing multimodal analytical methods collapse the brain 
+measurements either in space or time domain and fail
+to capture the spatio-temporal circuit dynamics. In this paper, we propose a novel 
+spatio-temporal graph Transformer model to integrate the
+structural and functional connectivity in both spatial and temporal domain.
+
+The proposed method is evaluated with the meta-analysis to explore the
+behavioral relevance of different brain regions and characterize the brain
+dynamical organization into low level functions region (i.e. sensory) and the
+complex function regions (i.e. memory).
+\cite{Zhao2022a}
+
+\subsection{Pipeline limitations}
+While effective, this model is not trained in an end-to-end
+fashion since the clustering, cluster-specific CBT generation, 
+and the population CBT estimation blocks are learned
+disjointly. Therefore, cumulated errors across these blocks
+might produce a less centered brain template
+\cite{Bessadok2022}
+
 \subsection{Interpretability Limitations}
 To highlight the importance of the brain ROIs, we introduce the explainable
 causal representation to encourage the reasonable node selection process. We

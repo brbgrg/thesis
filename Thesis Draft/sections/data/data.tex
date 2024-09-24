@@ -1,5 +1,20 @@
 
+
+NITRC.org
+https://www.nitrc.org/ir/app/action/DisplaySearchAction
+
 \section{Dataset Preprocessing}
+Several connectomic datasets
+have been proliferated such as the Human Connectome
+Project (HCP) [18], the Baby Connectome Project (BCP) [19]
+and the Connectome Related to Human Disease (CRHD)
+[20]. In these datasets, connectivity matrices were estimated
+using different tools. For instance, functional connectivity
+matrices were generated using CONN toolbox or groupwise
+whole-brain parcellation approaches [21], [22]. On the other
+hand, structural and morphological connectivity matrices
+were measured using FSL toolbox and Desikan-Killiany atlas via FreeSurfer software [23], [24], respectively
+\cite{Bessadok2022}
 
 The pre-processing of the resting state fMRI data was
 performed using both FSL (https://fsl.fmrib.ox.ac.uk/fsl/
@@ -21,6 +36,18 @@ the optimization) on both matrices.
 \section{Structural and Functional Connectivity Matrices}
 Structural connectivity (SC) matrices represent the anatomical connections between different brain regions.
 Functional connectivity (FC) matrices represent the temporal correlations between brain regions during resting state.
+
+Functional brain graphs. Conventionally, a functional graph is constructed from functional MRI
+(fMRI), more specifically from the blood-oxygen level-dependent (BOLD) signal which shows the
+changes in blood oxygenation over time linked to
+neural activity [11] in a particular region in the
+brain. First, the reported signal is averaged within
+each brain ROI. Next, a measure of correlation such
+as Pearson’s correlation coefficient is computed between pairwise regions which results in the 
+functional connectivity depicting the communication between pairs of brain regions. In functional brain
+graphs, nodes do not have features and edges are
+generally undirected and weighted
+\cite{Bessadok2022}
 
 Most existing studies focus more on structural brain networks 
 and functional brain networks, where both brain networks are 
@@ -75,3 +102,10 @@ Both SC and FC matrices have dimensions of 200 $\times$ 200 $\times$ 5 (nodes $\
 
 Nodes are already aligned across subjects and modalities based on a 
 common parcellation scheme, so no graph matching is needed? \cite{Puxeddu2022}
+
+For a given participant, the edge weights of graph matrix
+in functional and structural networks fall in the same range
+and their number of nodes are identical. The node definition
+follows the organization of brain atlas used in this study
+\cite{Zhang2022}
+

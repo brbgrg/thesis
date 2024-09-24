@@ -554,6 +554,7 @@ def louvain_preprocessing(graph):
     return graph_copy
 
 # Apply the Louvain preprocessing function to the preprocessed FC graphs
+
 fc_young_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_young_graph_preprocessed]
 fc_adult_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_adult_graph_preprocessed]
 fc_old_graph_preprocessed_louvain = [louvain_preprocessing(graph) for graph in fc_old_graph_preprocessed]
@@ -587,6 +588,7 @@ def community_detection(graph):
     partition = community_louvain.best_partition(graph)
     return partition
 
+"""
 sc_young_partition = [community_detection(graph) for graph in sc_young_graph_preprocessed_louvain]
 sc_adult_partition = [community_detection(graph) for graph in sc_adult_graph_preprocessed_louvain]
 sc_old_partition = [community_detection(graph) for graph in sc_old_graph_preprocessed_louvain]
@@ -594,7 +596,7 @@ sc_old_partition = [community_detection(graph) for graph in sc_old_graph_preproc
 fc_young_partition = [community_detection(graph) for graph in fc_young_graph_preprocessed_louvain]
 fc_adult_partition = [community_detection(graph) for graph in fc_adult_graph_preprocessed_louvain]
 fc_old_partition = [community_detection(graph) for graph in fc_old_graph_preprocessed_louvain]
-
+"""
 
 
 #TODO: maybe it's not the best to use the same positions for visualizing communities 
@@ -611,5 +613,89 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 
 # TODO: visualization with BrainNet Viewer
 
-# Graph embedding (Representation Learning)
 
+
+
+# GAT for aging biomarker identification
+
+# combine structural and functional graphs in a single graph
+
+import torch
+import scipy.stats
+import torch.nn.functional as F
+from torch_geometric.nn import GATConv
+from torch_geometric.data import Data, DataLoader
+
+
+def calculate_node_features(matrix):
+    """ matrix is a 2D torch tensor of shape (num_nodes, num_nodes) representing the connectivity matrix of a single subject.
+    Anatomical features are Number of Vertices (NumVert), Surface
+    Area (SurfArea), Gray Matter Volume (GrayVol), Average Thickness 
+    (ThickAvg), Thickness Standard Deviation (ThickStd), Integrated 
+    Rectified Mean Curvature (MeanCurv) and Integrated Rectified Gaussian 
+    Curvature (GausCurv) [6],
+    Functional features are from connectivity statistics: mean, standard deviation, kurtosis and
+    skewness of the node s connectivity vector to all the other nodes (Yang 2019)
+    """
+    node_features = []
+
+    for i in range(matrix.shape[0]):
+        # Functional features from connectivity statistics
+        connections = matrix[i, :]
+        mean = connections.mean().item()
+        std = connections.std().item()
+        skew = scipy.stats.skew(connections.numpy())
+        kurtosis = scipy.stats.kurtosis(connections.numpy())
+        node_features.append([mean, std, skew, kurtosis])
+    
+    return torch.tensor(node_features, dtype=torch.float32)
+
+def combined_graph(sc_matrix, fc_matrix):
+    """Combine structural and functional connectivity matrices
+     into a single graph representation where graphs are constructed 
+     from the functional connectivity matrices and the node features 
+     consist of both anatomical features and statistics of the nodal connectivity. (Yang 2019)"""
+    
+    # turn sc_matrix and fc_matrix into torch tensors
+    sc_tensor = torch.tensor(sc_matrix, dtype=torch.float)
+    fc_tensor = torch.tensor(fc_matrix, dtype=torch.float)
+
+    # Initialize empty tensors to store node features for each subject
+    num_subjects = sc_tensor.shape[2]
+    num_nodes = sc_tensor.shape[0]
+    num_features = 4  # mean, std, skew, kurtosis
+
+    sc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
+    fc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
+    
+    # Iterate over the third dimension of sc and fc tensor to fill them with node features for each subject
+    for i in range(num_subjects):
+        sc_node_features[:, :, i] = calculate_node_features(sc_tensor[:, :, i])
+        fc_node_features[:, :, i] = calculate_node_features(fc_tensor[:, :, i])
+
+    # Combine the node features
+    node_features = torch.cat([sc_node_features, fc_node_features], dim=1)
+
+    # Set edges for the graph
+    # TODO: redo all section
+    edges = []
+    edge_weights = []
+    for i in range(num_nodes):
+        for j in range(i+1, num_nodes):
+            # Remove null edges?  
+            # Add both directions since undirected?
+            edges.append([i, j])
+            edges.append([j, i])
+            edge_weights.append(weight)
+            edge_weights.append(weight)
+
+    edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() # (2, num_edges)
+    # edge_weights = 
+
+    # Create graph data object
+    data = Data(x=node_features, edge_index = edge_index, edge_attr = edge_weights)
+    
+    return data
+
+
+combined_graph(sc_young_matrix, fc_young_matrix)
