@@ -622,6 +622,7 @@ plot_and_save_graph(fc_young_graph_preprocessed_louvain, fc_adult_graph_preproce
 
 import torch
 import scipy.stats
+from torch_geometric.utils import to_networkx
 import torch.nn.functional as F
 from torch_geometric.nn import GATConv
 from torch_geometric.data import Data, DataLoader
@@ -664,7 +665,7 @@ def combined_graph(sc_matrix, fc_matrix):
     num_subjects = sc_tensor.shape[2]
     num_nodes = sc_tensor.shape[0]
     num_features = 4  # mean, std, skew, kurtosis
-
+    
     sc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
     fc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
     
@@ -674,23 +675,26 @@ def combined_graph(sc_matrix, fc_matrix):
         fc_node_features[:, :, i] = calculate_node_features(fc_tensor[:, :, i])
 
     # Combine the node features
+    # 8 features for each node
     node_features = torch.cat([sc_node_features, fc_node_features], dim=1)
 
-    # Set edges for the graph
-    # TODO: redo all section
+    # Set edges for the graph as in fc_matrix
     edges = []
     edge_weights = []
     for i in range(num_nodes):
         for j in range(i+1, num_nodes):
-            # Remove null edges?  
-            # Add both directions since undirected?
-            edges.append([i, j])
-            edges.append([j, i])
-            edge_weights.append(weight)
-            edge_weights.append(weight)
+            for k in range(num_subjects):
+                weight = fc_matrix[i, j, k]
+                # Remove null edges? (Yang doesn't)  
+                # Add both directions since undirected?
+                edges.append([i, j])
+                edges.append([j, i])
+                edge_weights.append(weight)
+                edge_weights.append(weight)
 
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() # (2, num_edges)
-    # edge_weights = 
+    edge_weights = torch.tensor(edge_weights, dtype=torch.float32)
+
 
     # Create graph data object
     data = Data(x=node_features, edge_index = edge_index, edge_attr = edge_weights)
@@ -698,4 +702,14 @@ def combined_graph(sc_matrix, fc_matrix):
     return data
 
 
-combined_graph(sc_young_matrix, fc_young_matrix)
+# Create a single graph from the combined matrices 
+graphs = {
+    'young': combined_graph(sc_young_matrix_preprocessed, fc_young_matrix_preprocessed),
+    'adult': combined_graph(sc_adult_matrix, fc_adult_matrix),
+    'old': combined_graph(sc_old_matrix, fc_old_matrix)
+}
+
+
+# check number of nodes and non-zero edges?
+
+
