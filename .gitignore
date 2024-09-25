@@ -4,6 +4,9 @@
 #Ignore build directory
 build/
 
+#Ignore data directory
+/thesis/data/
+
 # Ignore other common LaTeX auxiliary files
 *.aux
 *.log
