@@ -43,7 +43,7 @@ def save_figure(fig, filename, title=None):
     plt.close(fig)
 
 # Load connectivity data from .mat file
-data_path = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\data\scfc_schaefer100_ya_oa\scfc_schaefer100_ya_oa.mat"
+data_path = r"C:\Users\barbo\Desktop\thesis repo clone\thesis\scfc_schaefer100_ya_oa\scfc_schaefer100_ya_oa.mat"
 
 data = load_mat_file(data_path)
 
@@ -257,7 +257,9 @@ import torch
 import scipy.stats
 from torch_geometric.utils import to_networkx
 import torch.nn.functional as F
-from torch_geometric.nn import GATConv
+import torch.optim as optim
+import torch.nn as nn
+from torch_geometric.nn import GATConv, TopKPooling, global_mean_pool
 from torch_geometric.data import Data, DataLoader
 
 
@@ -369,5 +371,72 @@ for key, graph_list in graphs.items():
 
 
 
+# Split data in training and test sets (70-30)
+
+from sklearn.model_selection import train_test_split
+
+train_data, test_data = train_test_split(combined_graphs_labeled, test_size=0.3, random_state=42)
 
 
+class EGATNet(nn.Module):
+    def __init__(self):
+        super(EGATNet, self).__init__()
+        self.gat1 = GATConv(in_channels=4, out_channels=8, heads=5, concat=True)
+        self.pool1 = TopKPooling(in_channels=8*5, ratio=32/129)
+        self.gat2 = GATConv(in_channels=8*5, out_channels=16, heads=1, concat=True)
+        self.pool2 = TopKPooling(in_channels=16, ratio=4/32)
+        self.fc1 = nn.Linear(16*4, 64)
+        self.fc2 = nn.Linear(64, 2)  # Assuming binary classification
+
+
+    def forward(self, data):
+        x, edge_index, edge_attr, batch = data.x, data.edge_index, data.edge_attr, data.batch
+        x = self.gat1(x, edge_index)
+        x, edge_index, edge_attr, batch, _ = self.pool1(x, edge_index, edge_attr, batch=batch)
+        x = self.gat2(x, edge_index)
+        x, edge_index, edge_attr, batch, _ = self.pool2(x, edge_index, edge_attr, batch=batch)
+        x = global_mean_pool(x, batch)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=1)
+
+
+# Create data loaders
+train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
+
+
+# Initialize the model, loss function, and optimizer
+model = EGATNet()
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# Training loop
+def train():
+    model.train()
+    for data, label in train_loader:
+        optimizer.zero_grad()
+        output = model(data)
+        loss = criterion(output, label)
+        loss.backward()
+        optimizer.step()
+
+# Evaluation function
+def evaluate(loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data, label in loader:
+            output = model(data)
+            pred = output.argmax(dim=1)
+            correct += (pred == label).sum().item()
+            total += label.size(0)
+    return correct / total
+
+# Train the model
+for epoch in range(50):  # Number of epochs
+    train()
+    train_acc = evaluate(train_loader)
+    test_acc = evaluate(test_loader)
+    print(f'Epoch {epoch+1}, Train Accuracy: {train_acc:.4f}, Test Accuracy: {test_acc:.4f}')
