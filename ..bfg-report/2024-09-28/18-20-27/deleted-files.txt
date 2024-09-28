@@ -1,0 +1,6 @@
+5faf9642aea5101cbdbe01f9151b07775b1cb533 13586291 BNA_SC_4D.nii.gz
+f347b6f9574df330ea0e7d17d2b39f04aa8f2f3b 13427766 T1w_acpc_dc_restore_brain.nii.gz
+5ace8ea93f8d2a3741f4d267954e2ad37e1b3a39 1648877 t10k-images-idx3-ubyte.gz
+a7e141541c1d08d3f2ed01eae03e644f9e2fd0c5 4542 t10k-labels-idx1-ubyte.gz
+b50e4b6bccdebde3d57f575c7fbeb24bec277f10 9912422 train-images-idx3-ubyte.gz
+707a576bb523304d5b674de436c0779d77b7d480 28881 train-labels-idx1-ubyte.gz
