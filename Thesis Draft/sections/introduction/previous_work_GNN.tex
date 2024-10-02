@@ -1,5 +1,14 @@
 \section{GNN}
 
+More recently, Hamilton et al. (2017) introduced GraphSAGE,
+a method for computing node representations in an inductive manner. This technique operates by
+sampling a fixed-size neighborhood of each node, and then performing a specific aggregator over
+it (such as the mean over all the sampled neighbors’ feature vectors, or the result of feeding them
+through a recurrent neural network). This approach has yielded impressive performance across several large-scale inductive benchmarks.
+\cite{Velickovic2018}
+
+
+
 Other
 works preferred to learn the graph embedding using graph
 attention network (GAT) which focuses on learning from

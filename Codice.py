@@ -151,7 +151,6 @@ for key, matrix in matrices.items():
     graphs[key] = [matrix_to_graph(matrix[:, :, i]) for i in range(num_subjects)] #list of graphs
 
 
-
 # Visualize the graphs
 
 def plot_graph_on_axis(graph, ax, title, pos=None, partition=None):
@@ -246,9 +245,6 @@ def plot_and_save_graph(graphs, filename=None, positions=None, partitions=None, 
 
 
 
-
-
-
 # GAT for aging biomarker identification
 
 # combine structural and functional graphs in a single graph
@@ -262,60 +258,90 @@ import torch.nn as nn
 from torch_geometric.nn import GATConv, TopKPooling, global_mean_pool
 from torch_geometric.data import Data, DataLoader
 
+# Topological measures that significantly change with age across the lifespan
+# different among structural and functional networks?
 
-def calculate_node_features(sc_matrix):
-    """ sc_matrix is a 2D torch tensor of shape (num_nodes, num_nodes) representing the structural connectivity matrix of a single subject.
-    features are from connectivity statistics: mean, standard deviation, kurtosis and
-    skewness of the node's connectivity vector to all the other nodes (Yang 2019)
+# functional connectivity topological measures
+# from Cao 2014 
+# Local efficiency (inverted U shape) (sex differences only in global?)
+# Modularity (decrease linearly) ( without global signal regression modularity failed to detect age effects)
+# Mean connectivity strength (negative quadratic trajectories)
+# Normalized Rich Club coefficients (inverse U shape over a range of hub thresholds) (no significant sex differences)
+# Regional Functional Connectivity Strength (rFCS) (Age-related linear and quadratic changes both positive and negative) (male higher connectivity strength in some areas)
+# participation coefficient?
+# centrality measures? (sub-graph centrality)
+
+# structural connectivity topological measures
+
+
+def calculate_node_features(matrix):
+    """Calculate node features from a connectivity matrix.
+    Features are from connectivity statistics: mean, standard deviation, kurtosis, skewness,
+    and degree centrality of the node's connectivity vector to all the other nodes (Yang 2019).
     """
     node_features = []
 
-    for i in range(sc_matrix.shape[0]):
+    for i in range(matrix.shape[0]):
+
+
         # Functional features from connectivity statistics
-        connections = sc_matrix[i, :]
+        connections = matrix[i, :]
+        connections = connections.flatten()
         mean = connections.mean().item()
         std = connections.std().item()
-        skew = scipy.stats.skew(connections.numpy())
-        kurtosis = scipy.stats.kurtosis(connections.numpy())
+        skew = scipy.stats.skew(connections).item()
+        kurtosis = scipy.stats.kurtosis(connections).item()
+        
+        # Calculate degree centrality
+        
         node_features.append([mean, std, skew, kurtosis])
     
+    # Convert the list of lists to a numpy array before converting to a tensor
+    node_features = np.array(node_features)
     return torch.tensor(node_features, dtype=torch.float32)
 
 
-def combined_graph(fc_matrix, sc_matrix):
-    """Combine structural and functional connectivity matrices
-     into a single graph representation where graphs are constructed 
-     from the functional connectivity matrices and the node features 
-     consist of both anatomical features and statistics of the nodal connectivity. (Yang 2019)"""
-    
-    # turn sc_matrix and fc_matrix into torch tensors
-    sc_tensor = torch.tensor(sc_matrix, dtype=torch.float)
-    fc_tensor = torch.tensor(fc_matrix, dtype=torch.float)
+# dimensionality reduction (PCA, autoencoders) or feature selections to decrease the number of features?
 
-    # Initialize empty tensors to store node features for each subject
-    num_subjects = sc_tensor.shape[2]
-    num_nodes = sc_tensor.shape[0]
-    num_features = 4  # mean, std, skew, kurtosis
+def combined_graph(matrix, feature_tensor=None, feature_type='random'):
+    """Combine a connectivity matrix and a feature tensor into a single graph.
+    Graphs are constructed from the connectivity matrix and the node features 
+    consist of the provided feature tensor. If feature_tensor is not provided,
+    the user can choose between using a random tensor or an identity tensor.
     
-    sc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
+    Parameters:
+    - matrix: The connectivity matrix.
+    - feature_tensor: The tensor containing node features. If None, feature_type is used.
+    - feature_type: The type of tensor to use if feature_tensor is None. Options are 'random' or 'identity'.
+    """
     
-    # does not make sense
-    #fc_node_features = torch.empty((num_nodes, num_features, num_subjects), dtype=torch.float32)
-    
+    # Turn matrix into torch tensor
+    tensor_matrix = torch.tensor(matrix, dtype=torch.float)
+
     # Initialize empty list for storing graph data objects
     graph_list = []
 
-    # Iterate over the third dimension of sc and fc tensor to fill them with node features for each subject
-    for i in range(num_subjects):
-        sc_node_features[:, :, i] = calculate_node_features(sc_tensor[:, :, i])
-        #fc_node_features[:, :, i] = calculate_node_features(fc_tensor[:, :, i])
+    # Determine the number of subjects and nodes
+    num_subjects = tensor_matrix.shape[2]
+    num_nodes = tensor_matrix.shape[0]
 
-        # Set edges for the graph as in fc_matrix
+    # Generate feature tensor if not provided
+    if feature_tensor is None:
+        if feature_type == 'random':
+            feature_tensor = torch.rand((num_nodes, 4), dtype=torch.float32)
+        elif feature_type == 'identity':
+            feature_tensor = torch.eye(num_nodes, dtype=torch.float32)
+        else:
+            raise ValueError("Invalid feature_type. Choose 'random' or 'identity'.")
+
+    # Iterate over the third dimension of tensor_matrix to fill them with node features for each subject
+    for i in range(num_subjects):
+        # Set edges for the graph as in tensor_matrix
         edges = []
         edge_weights = []
         for j in range(num_nodes):
             for k in range(j+1, num_nodes):
-                weight = fc_matrix[j, k, i]
+                weight = tensor_matrix[j, k, i]
                 # Remove null edges? (Yang doesn't)  
                 # Add both directions since undirected?
                 if weight != 0:  # Remove null edges
@@ -331,7 +357,7 @@ def combined_graph(fc_matrix, sc_matrix):
         edge_weights = torch.tensor(edge_weights, dtype=torch.float32)
 
         # Create graph data object
-        data = Data(x=sc_node_features[:,:,i], edge_index = edge_index, edge_attr = edge_weights)
+        data = Data(x=feature_tensor, edge_index=edge_index, edge_attr=edge_weights)
         
         # Append the graph data object to the list
         graph_list.append(data)
@@ -339,18 +365,48 @@ def combined_graph(fc_matrix, sc_matrix):
     return graph_list
 
 
-# Create a single graph from the combined matrices 
-# Each element is a list of 5 graph data objects
-combined_graphs = {
-    'ya': combined_graph(matrices['fc_ya'], matrices['sc_ya']), #list of graphs
-    'oa': combined_graph(matrices['fc_oa'], matrices['sc_oa'])
+# Calculate node features for both structural and functional matrices
+features = {
+    'sc_ya': calculate_node_features(matrices['sc_ya']),
+    'sc_oa': calculate_node_features(matrices['sc_oa']),
+    'fc_ya': calculate_node_features(matrices['fc_ya']),
+    'fc_oa': calculate_node_features(matrices['fc_oa']),
 }
+
+
+# Each element is a list of graph data objects
+#TODO: stack functional and structural features together?
+#TODO: using multi-edge connections instead of separate modalities?
+combined_graphs = {
+    'fc_sc_ya': combined_graph(matrices['fc_ya'], features['sc_ya']),
+    'fc_sc_oa': combined_graph(matrices['fc_oa'], features['sc_oa']),
+    'sc_fc_ya': combined_graph(matrices['sc_ya'], features['fc_ya']),
+    'sc_fc_oa': combined_graph(matrices['sc_oa'], features['fc_oa']),
+    'fc_fc_ya': combined_graph(matrices['fc_ya'], features['fc_ya']),
+    'fc_fc_oa': combined_graph(matrices['fc_oa'], features['fc_oa']),
+    'sc_sc_ya': combined_graph(matrices['sc_ya'], features['sc_ya']),
+    'sc_sc_oa': combined_graph(matrices['sc_oa'], features['sc_oa']),
+    'sc_rand_ya': combined_graph(matrices['sc_ya']),
+    'fc_rand_ya': combined_graph(matrices['fc_ya']),
+    'sc_rand_oa': combined_graph(matrices['sc_oa']),
+    'fc_rand_oa': combined_graph(matrices['fc_oa']),
+    'sc_eye_ya': combined_graph(matrices['sc_ya'], feature_type='identity'),
+    'fc_eye_ya': combined_graph(matrices['fc_ya'], feature_type='identity'),
+    'sc_eye_oa': combined_graph(matrices['sc_oa'], feature_type='identity'),
+    'fc_eye_oa': combined_graph(matrices['fc_oa'], feature_type='identity')
+}
+
 
 # check number of nodes and non-zero edges?
 
 # Create labeled graph set for GAT training (structural, functional and combined)
 
 
+combined_graphs_labeled = [(graph, label) for label, graph_list in combined_graphs.items() for graph in graph_list]
+
+
+
+"""
 combined_graphs_labeled = [] #len = 179
 
 for label, graph_list in combined_graphs.items():
@@ -365,19 +421,20 @@ for key, graph_list in graphs.items():
     if type == 'sc':
         for i in range(len(graph_list)):
             structural_graphs_labeled.append((graph_list[i], label)) 
-    else:
+    elif type == 'fc':
         for i in range(len(graph_list)):
             functional_graphs_labeled.append((graph_list[i], label))
-
+"""
 
 
 # Split data in training and test sets (70-30)
 
 from sklearn.model_selection import train_test_split
+from itertools import combinations
 
 train_data, test_data = train_test_split(combined_graphs_labeled, test_size=0.3, random_state=42)
 
-
+"""
 class EGATNet(nn.Module):
     def __init__(self):
         super(EGATNet, self).__init__()
@@ -440,3 +497,4 @@ for epoch in range(50):  # Number of epochs
     train_acc = evaluate(train_loader)
     test_acc = evaluate(test_loader)
     print(f'Epoch {epoch+1}, Train Accuracy: {train_acc:.4f}, Test Accuracy: {test_acc:.4f}')
+"""
